@@ -1,7 +1,7 @@
 import { materialByCode } from "../models/catalog";
 import type { Material, Scan } from "../models/types";
 import type { VisionHit } from "../models/types";
-import { api, apiUpload } from "./http";
+import { api, apiUpload, apiUrl } from "./http";
 import { sessionRepository } from "./sessionRepository";
 
 const QUEUE = "ecoscan.queue";
@@ -37,6 +37,7 @@ type ApiScan = {
   accent: string;
   warning: string;
   recyclable: boolean;
+  has_photo?: boolean;
 };
 
 export function mapScan(raw: ApiScan, local = false): Scan {
@@ -61,6 +62,7 @@ export function mapScan(raw: ApiScan, local = false): Scan {
     accent: raw.accent,
     warning: raw.warning,
     recyclable: raw.recyclable,
+    hasPhoto: Boolean(raw.has_photo),
     local,
   };
 }
@@ -114,18 +116,28 @@ export const scanRepository = {
     const rows = await api<ApiScan[]>("/api/scans", {}, token);
     return rows.map((row) => mapScan(row));
   },
-  async create(draft: ScanDraft): Promise<Scan> {
+  async create(draft: ScanDraft, file?: File | null): Promise<Scan> {
     const token = sessionRepository.token();
     try {
-      const row = await api<ApiScan>(
-        "/api/scans",
-        { method: "POST", body: JSON.stringify(toBody(draft)) },
-        token,
-      );
+      const row = file
+        ? await apiUpload<ApiScan>("/api/scans", file, token, toFields(draft), "No se pudo guardar el escaneo")
+        : await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(draft)) }, token);
       return mapScan(row);
     } catch (error) {
       if (!isOffline(error)) throw error;
       return this.keepLocal(draft);
+    }
+  },
+  async photo(id: number): Promise<string | null> {
+    const token = sessionRepository.token();
+    const headers = new Headers();
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+    try {
+      const response = await fetch(apiUrl(`/api/scans/${id}/photo`), { headers });
+      if (!response.ok) return null;
+      return URL.createObjectURL(await response.blob());
+    } catch {
+      return null;
     }
   },
   keepLocal(draft: ScanDraft): Scan {
@@ -163,6 +175,15 @@ export const scanRepository = {
     localStorage.setItem(LOCAL, JSON.stringify(local));
   },
 };
+
+function toFields(draft: ScanDraft): Record<string, string> {
+  return {
+    material_code: draft.materialCode,
+    object_name: draft.objectName,
+    confidence: String(draft.confidence),
+    separated_well: draft.separatedWell ? "true" : "false",
+  };
+}
 
 function toBody(draft: ScanDraft) {
   return {

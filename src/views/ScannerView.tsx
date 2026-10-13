@@ -19,6 +19,7 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
   const stageRef = useRef<HTMLDivElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
   const photoJob = useRef(0);
+  const photoFile = useRef<File | null>(null);
   const desk = variant === "desk";
   const [source, setSource] = useState<"camera" | "photo">("photo");
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
@@ -160,6 +161,7 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
 
   async function pickPhoto(file: File | undefined) {
     if (!file) return;
+    photoFile.current = file;
     if (photoUrl) URL.revokeObjectURL(photoUrl);
     const url = URL.createObjectURL(file);
     const job = photoJob.current + 1;
@@ -196,12 +198,15 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
     setBusy(true);
     setSaveError("");
     try {
-      const scan = await scanService.register({
-        materialCode: material.code,
-        objectName,
-        confidence: hit.confidence,
-        separatedWell: hit.confidence >= 0.72,
-      });
+      const scan = await scanService.register(
+        {
+          materialCode: material.code,
+          objectName,
+          confidence: hit.confidence,
+          separatedWell: hit.confidence >= 0.72,
+        },
+        photoFile.current,
+      );
       sessionStorage.setItem("ecoscan.last", JSON.stringify(scan));
       if (hit.guide) sessionStorage.setItem("ecoscan.lastGuide", JSON.stringify(hit.guide));
       else sessionStorage.removeItem("ecoscan.lastGuide");

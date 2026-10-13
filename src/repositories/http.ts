@@ -7,7 +7,7 @@ export class ApiError extends Error {
   }
 }
 
-function apiUrl(path: string) {
+export function apiUrl(path: string) {
   const base = String(import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
   return `${base}${path}`;
 }
@@ -37,10 +37,19 @@ export async function api<T>(path: string, options: RequestInit = {}, token?: st
   return response.json() as Promise<T>;
 }
 
-export async function apiUpload<T>(path: string, file: File, token?: string | null): Promise<T> {
+export async function apiUpload<T>(
+  path: string,
+  file: File,
+  token?: string | null,
+  fields?: Record<string, string>,
+  failure = "No se pudo analizar la foto",
+): Promise<T> {
   const headers = new Headers();
   if (token) headers.set("Authorization", `Bearer ${token}`);
   const body = new FormData();
+  if (fields) {
+    for (const [key, value] of Object.entries(fields)) body.append(key, value);
+  }
   body.append("file", file, file.name || "foto.jpg");
 
   let response: Response;
@@ -51,11 +60,11 @@ export async function apiUpload<T>(path: string, file: File, token?: string | nu
   }
 
   if (!response.ok) {
-    let message = "No se pudo analizar la foto";
+    let message = failure;
     try {
       message = readDetail(await response.json());
     } catch {
-      message = "No se pudo analizar la foto";
+      message = failure;
     }
     throw new ApiError(response.status, message);
   }

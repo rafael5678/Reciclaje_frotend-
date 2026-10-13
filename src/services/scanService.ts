@@ -8,8 +8,8 @@ export const scanService = {
   analyzePhoto(file: File): Promise<VisionHit> {
     return scanRepository.analyzePhoto(file);
   },
-  register(draft: ScanDraft): Promise<Scan> {
-    return scanRepository.create(draft);
+  register(draft: ScanDraft, file?: File | null): Promise<Scan> {
+    return scanRepository.create(draft, file);
   },
   flush(): Promise<void> {
     return scanRepository.flush();

@@ -38,6 +38,7 @@ export type Scan = {
   accent: string;
   warning: string;
   recyclable: boolean;
+  hasPhoto?: boolean;
   local?: boolean;
 };
 

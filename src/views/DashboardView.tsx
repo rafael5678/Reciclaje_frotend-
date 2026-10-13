@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Delta, Legend, StackBar } from "../components/Charts";
 import { Icon } from "../components/Icons";
-import { WasteArt } from "../components/WasteArt";
+import { ScanPhoto } from "../components/ScanPhoto";
 import type { Impact } from "../models/types";
 import { formatAgo, formatKg, signedPercent } from "../services/format";
 import { impactService } from "../services/impactService";
@@ -49,7 +49,7 @@ export function DashboardView() {
             <div className="recent-grid">
               {impact.recent.slice(0, 4).map((scan) => (
                 <article className="mini-scan" key={scan.id}>
-                  <WasteArt code={scan.materialCode} />
+                  <ScanPhoto scan={scan} />
                   <h3>{scan.objectName}</h3>
                   <p>{formatAgo(scan.createdAt)}</p>
                   <footer>

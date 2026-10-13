@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { BinPill, CategoryBars, WeeklyChart } from "../components/Charts";
+import { ScanPhoto } from "../components/ScanPhoto";
 import { Icon } from "../components/Icons";
 import type { Impact, Scan } from "../models/types";
 import { formatPercent, formatWhen } from "../services/format";
@@ -104,8 +105,13 @@ export function ScansView() {
               {visible.map((scan) => (
                 <tr key={scan.id}>
                   <td>
-                    <span className="code-badge" style={{ color: scan.accent, background: `${scan.accent}22` }}>{scan.materialCode}</span>
-                    {scan.objectName}
+                    <span className="object-cell">
+                      <ScanPhoto scan={scan} compact />
+                      <span>
+                        <span className="code-badge" style={{ color: scan.accent, background: `${scan.accent}22` }}>{scan.materialCode}</span>
+                        {scan.objectName}
+                      </span>
+                    </span>
                   </td>
                   <td>{scan.category}</td>
                   <td><BinPill label={scan.container} tone={scan.tone} /></td>

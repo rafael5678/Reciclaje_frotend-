@@ -514,6 +514,12 @@ h1, h2, h3, p { margin: 0; }
 .mini-scan footer { display: flex; justify-content: space-between; align-items: center; color: var(--accent); }
 .mini-scan .art, .impact-hero .art { background: linear-gradient(#efe8df, #b7c3c0); }
 .art { display: grid; place-items: center; border-radius: 14px; overflow: hidden; min-height: 84px; }
+.scan-photo { border-radius: 14px; overflow: hidden; }
+.scan-thumb { width: 100%; height: 92px; object-fit: cover; display: block; background: #10241f; }
+.scan-photo.compact { width: 42px; height: 42px; border-radius: 8px; flex: none; }
+.scan-photo.compact .art { min-height: 42px; width: 42px; }
+.scan-photo.compact .scan-thumb { width: 42px; height: 42px; }
+.object-cell { display: flex; align-items: center; gap: 10px; }
 .art svg { width: 78%; height: 88%; }
 .tips ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 10px; }
 .tips li { display: flex; gap: 10px; align-items: flex-start; color: #d5eee4; font-size: 14px; line-height: 1.4; }
