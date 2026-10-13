@@ -12,7 +12,7 @@ export function SettingsView() {
       <header className="page-head light-text">
         <div>
           <h1>Configuración</h1>
-          <p>Tu cuenta guarda el historial. La cámara no lo necesita para clasificar.</p>
+          <p>Tu cuenta guarda el historial. Las fotos se analizan en la nube con Gemini.</p>
         </div>
       </header>
       <section className="panel-card settings-card">
@@ -23,9 +23,9 @@ export function SettingsView() {
         </div>
       </section>
       <section className="panel-card settings-list">
-        <div><strong>Motor</strong><span>EcoScan-Lite, inferencia local</span></div>
+        <div><strong>Motor</strong><span>Gemini, con apoyo de MIRA y TrashNet</span></div>
         <div><strong>Cuenta demo</strong><span>rafael@ecoscan.app · ecoscan123</span></div>
-        <div><strong>Privacidad</strong><span>La foto del residuo no se sube al servidor</span></div>
+        <div><strong>Privacidad</strong><span>La foto se usa para clasificar. El historial queda en tu cuenta.</span></div>
       </section>
       <button
         className="cta cta-inline"

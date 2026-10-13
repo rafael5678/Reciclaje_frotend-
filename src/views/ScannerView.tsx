@@ -383,7 +383,7 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
                 <Icon name="close" size={18} />
               </button>
             </header>
-            <p>La foto se analiza en el servidor con MIRA y el dataset TrashNet. Puedes subir otra imagen cuando quieras.</p>
+            <p>La foto se analiza con Gemini. Si no hay conexión, se usan MIRA y TrashNet. Puedes subir otra imagen cuando quieras.</p>
             <div className="face-row">
               <button className={facing === "environment" ? "is-on" : ""} onClick={() => setFacing("environment")}>Trasera</button>
               <button className={facing === "user" ? "is-on" : ""} onClick={() => setFacing("user")}>Frontal</button>

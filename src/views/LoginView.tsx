@@ -38,7 +38,7 @@ export function LoginView() {
         <Brand />
         <Earth className="welcome-earth small" />
         <h1>{mode === "login" ? "Iniciar sesión" : "Crear cuenta"}</h1>
-        <p>Tu historial y tu impacto se guardan en tu cuenta. La cámara sigue trabajando en el dispositivo.</p>
+        <p>Tu historial queda en tu cuenta. La foto se analiza en la nube y el resultado se guarda con tu usuario.</p>
         <form onSubmit={(event) => void submit(event)} className="form">
           {mode === "register" ? (
             <label className="field">

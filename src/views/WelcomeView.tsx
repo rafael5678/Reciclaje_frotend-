@@ -36,7 +36,7 @@ export function WelcomeView() {
         <Brand />
         <Earth className="welcome-earth" />
         <h1>Tu aliado en el reciclaje inteligente</h1>
-        <p>Usa la cámara de tu celular para identificar y clasificar residuos en tiempo real.</p>
+        <p>Sube una foto del residuo y te decimos en qué contenedor va, con los pasos para dejarlo bien.</p>
         {error ? <p className="sheet-error">{error}</p> : null}
         <button className="cta" onClick={() => void enter(window.matchMedia("(min-width: 960px)").matches ? "/panel/escanear" : "/app/escaner")} disabled={busy}>
           {busy ? "Entrando..." : "Comenzar"}

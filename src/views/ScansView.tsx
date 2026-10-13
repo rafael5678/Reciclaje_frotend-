@@ -43,7 +43,7 @@ export function ScansView() {
       <header className="page-head">
         <div>
           <h1>Mis escaneos</h1>
-          <p>Todo se guarda en este equipo. Aquí ves cuántos objetos llevas y cómo los separas.</p>
+          <p>Tu historial vive en tu cuenta. Aquí ves cuántos objetos llevas y cómo los separas.</p>
         </div>
         <Link className="cta cta-inline" to="/panel/escanear">
           <Icon name="camera" size={18} />

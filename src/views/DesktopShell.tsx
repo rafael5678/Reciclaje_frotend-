@@ -108,8 +108,8 @@ function ModelBadge() {
     <div className="model-badge">
       <i />
       <div>
-        <strong>Modelo cargado</strong>
-        <span>EcoScan-Lite · {meta ? `${meta.ms} ms` : "en el dispositivo"}</span>
+        <strong>Clasificador listo</strong>
+        <span>Gemini en la nube{meta ? ` · ${meta.ms} ms` : ""}</span>
       </div>
     </div>
   );

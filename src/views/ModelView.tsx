@@ -20,14 +20,14 @@ export function ModelView() {
     <div className="model-page">
       <header className="page-head">
         <div>
-          <h1>Modelo en el dispositivo</h1>
-          <p>Una sola pasada: localizar el residuo y decir de qué material es. La imagen no viaja al servidor.</p>
+          <h1>Cómo clasifica</h1>
+          <p>Gemini mira la foto, dice qué objeto es y explica en qué contenedor va. MIRA y TrashNet ayudan cuando no hay conexión con Gemini.</p>
         </div>
       </header>
       <section className="model-stats">
-        <article className="panel-card"><span>Estado</span><strong>Listo sin conexión</strong></article>
+        <article className="panel-card"><span>Estado</span><strong>Listo en la nube</strong></article>
         <article className="panel-card"><span>Última inferencia</span><strong>{meta ? `${meta.ms} ms` : "Aún no corre"}</strong></article>
-        <article className="panel-card"><span>Motor</span><strong>MIRA + TrashNet</strong></article>
+        <article className="panel-card"><span>Motor</span><strong>Gemini + MIRA</strong></article>
       </section>
       <section className="panel-card pipeline">
         <h2>Cómo decide</h2>
@@ -36,12 +36,9 @@ export function ModelView() {
           <li>TrashNet mira el recorte: cartón, vidrio, metal, papel, plástico o basura.</li>
           <li>Si hay tapa roja, hoja impresa, lápiz, celular o control, gana esa forma.</li>
           <li>Los dos modelos se ponen de acuerdo y eligen el contenedor.</li>
-          <li>La foto no viaja. Recién si confirmas, se guarda el resultado.</li>
+          <li>Gemini explica qué es el objeto, a qué contenedor va y qué tienes que hacer.</li>
+          <li>Si confirmas, el resultado se guarda en tu historial.</li>
         </ol>
-        <p className="hint">
-          En un empaquetado nativo este mismo contrato se cubre con YOLOv8-Lite exportado a TensorFlow Lite.
-          Esta versión web ejecuta el detector dentro del navegador para que funcione en el teléfono sin instalar una tienda de modelos.
-        </p>
       </section>
       <section className="panel-card">
         <header className="section-head">

@@ -30,7 +30,7 @@ export function DashboardView() {
         <section className="hero">
           <div className="hero-copy">
             <h1>Clasifica hoy,<br /><em>recicla siempre</em></h1>
-            <p>Escanea tus residuos con la cámara y descubre en qué contenedor depositarlos, con instrucciones claras y en tiempo real.</p>
+            <p>Sube una foto y descubre en qué contenedor va cada residuo, con los pasos para dejarlo bien.</p>
             <Link className="cta cta-inline" to="/panel/escanear">
               <Icon name="camera" size={18} />
               Escanear ahora
