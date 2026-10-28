@@ -1,7 +1,7 @@
 import type { User } from "../models/types";
 import { api } from "./http";
 
-type ApiUser = { id: number; name: string; email: string };
+type ApiUser = { id: number; name: string; email: string; guest?: boolean };
 type ApiToken = { token: string; user: ApiUser };
 
 export const authRepository = {
@@ -16,6 +16,9 @@ export const authRepository = {
       method: "POST",
       body: JSON.stringify({ name, email, password }),
     });
+  },
+  guest() {
+    return api<ApiToken>("/api/auth/guest", { method: "POST" });
   },
   async me(token: string): Promise<User> {
     return api<ApiUser>("/api/auth/me", {}, token);

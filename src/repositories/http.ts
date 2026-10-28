@@ -7,6 +7,11 @@ export class ApiError extends Error {
   }
 }
 
+const OFFLINE = "Sin conexión con el servidor";
+const MISCONFIGURED = "La app no encuentra la API. Revisa VITE_API_URL en Vercel";
+// Render apaga el servidor gratuito si no se usa; el primer pedido puede tardar en despertarlo.
+const RETRY_DELAYS = [2500, 6000];
+
 export function apiUrl(path: string) {
   const base = String(import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
   return `${base}${path}`;
@@ -16,25 +21,14 @@ export async function api<T>(path: string, options: RequestInit = {}, token?: st
   const headers = new Headers(options.headers);
   if (!headers.has("Content-Type") && options.body) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
+  const retries = (options.method ?? "GET").toUpperCase() === "GET" ? RETRY_DELAYS : [];
 
-  let response: Response;
-  try {
-    response = await fetch(apiUrl(path), { ...options, headers });
-  } catch {
-    throw new ApiError(0, "Sin conexión con el servidor");
-  }
-
+  const response = await send(() => fetch(apiUrl(path), { ...options, headers }), retries);
   if (!response.ok) {
-    let message = "No se pudo completar la acción";
-    try {
-      message = readDetail(await response.json());
-    } catch {
-      message = "No se pudo completar la acción";
-    }
-    throw new ApiError(response.status, message);
+    throw new ApiError(response.status, await readError(response, "No se pudo completar la acción"));
   }
   if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  return readJson<T>(response);
 }
 
 export async function apiUpload<T>(
@@ -52,27 +46,38 @@ export async function apiUpload<T>(
   }
   body.append("file", file, file.name || "foto.jpg");
 
-  let response: Response;
-  try {
-    response = await fetch(apiUrl(path), { method: "POST", headers, body });
-  } catch {
-    throw new ApiError(0, "Sin conexión con el servidor");
-  }
+  const response = await send(() => fetch(apiUrl(path), { method: "POST", headers, body }), []);
+  if (!response.ok) throw new ApiError(response.status, await readError(response, failure));
+  return readJson<T>(response);
+}
 
-  if (!response.ok) {
-    let message = failure;
+async function send(run: () => Promise<Response>, retries: number[]): Promise<Response> {
+  for (let attempt = 0; ; attempt += 1) {
     try {
-      message = readDetail(await response.json());
+      return await run();
     } catch {
-      message = failure;
+      if (attempt >= retries.length) throw new ApiError(0, OFFLINE);
+      await wait(retries[attempt]);
     }
-    throw new ApiError(response.status, message);
   }
+}
+
+async function readJson<T>(response: Response): Promise<T> {
+  const type = response.headers.get("content-type") ?? "";
+  if (!type.includes("application/json")) throw new ApiError(0, MISCONFIGURED);
   return response.json() as Promise<T>;
 }
 
-function readDetail(body: unknown): string {
-  if (!body || typeof body !== "object" || !("detail" in body)) return "No se pudo completar la acción";
+async function readError(response: Response, fallback: string): Promise<string> {
+  try {
+    return readDetail(await response.json(), fallback);
+  } catch {
+    return fallback;
+  }
+}
+
+function readDetail(body: unknown, fallback: string): string {
+  if (!body || typeof body !== "object" || !("detail" in body)) return fallback;
   const detail = (body as { detail?: unknown }).detail;
   if (typeof detail === "string") return detail;
   if (Array.isArray(detail)) {
@@ -83,5 +88,9 @@ function readDetail(body: unknown): string {
       })
       .join(". ");
   }
-  return "No se pudo completar la acción";
+  return fallback;
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

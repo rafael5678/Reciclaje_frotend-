@@ -1,24 +1,11 @@
-import { useEffect, useState } from "react";
 import { BinPill, Delta, Legend, StackBar } from "../components/Charts";
+import { LoadState } from "../components/LoadState";
 import { WasteArt } from "../components/WasteArt";
-import type { Impact } from "../models/types";
 import { formatKg, formatWhen } from "../services/format";
-import { impactService } from "../services/impactService";
-import { useSession } from "./SessionProvider";
+import { useImpact } from "./useImpact";
 
 export function ImpactView() {
-  const { revision } = useSession();
-  const [impact, setImpact] = useState<Impact | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    impactService.get().then((data) => {
-      if (alive) setImpact(data);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [revision]);
+  const { impact, error, retry } = useImpact();
 
   return (
     <div className="impact">
@@ -27,7 +14,7 @@ export function ImpactView() {
       </div>
       <section className="impact-sheet">
         <h1>Mi Impacto</h1>
-        {!impact ? <p className="loading">Cargando...</p> : (
+        {!impact ? <LoadState error={error} onRetry={retry} /> : (
           <>
             <div className="metric-row">
               <div>

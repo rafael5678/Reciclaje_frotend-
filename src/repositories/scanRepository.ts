@@ -1,11 +1,7 @@
 import { materialByCode } from "../models/catalog";
-import type { Material, Scan } from "../models/types";
-import type { VisionHit } from "../models/types";
+import type { Scan, VisionHit } from "../models/types";
 import { api, apiUpload, apiUrl } from "./http";
 import { sessionRepository } from "./sessionRepository";
-
-const QUEUE = "ecoscan.queue";
-const LOCAL = "ecoscan.localScans";
 
 export type ScanDraft = {
   materialCode: string;
@@ -13,8 +9,6 @@ export type ScanDraft = {
   confidence: number;
   separatedWell: boolean;
 };
-
-type Pending = ScanDraft & { clientId: number };
 
 type ApiScan = {
   id: number;
@@ -40,7 +34,7 @@ type ApiScan = {
   has_photo?: boolean;
 };
 
-export function mapScan(raw: ApiScan, local = false): Scan {
+export function mapScan(raw: ApiScan): Scan {
   return {
     id: raw.id,
     materialCode: raw.material_code,
@@ -63,24 +57,7 @@ export function mapScan(raw: ApiScan, local = false): Scan {
     warning: raw.warning,
     recyclable: raw.recyclable,
     hasPhoto: Boolean(raw.has_photo),
-    local,
   };
-}
-
-function readPending(): Pending[] {
-  try {
-    return JSON.parse(localStorage.getItem(QUEUE) || "[]") as Pending[];
-  } catch {
-    return [];
-  }
-}
-
-function readLocal(): Scan[] {
-  try {
-    return JSON.parse(localStorage.getItem(LOCAL) || "[]") as Scan[];
-  } catch {
-    return [];
-  }
 }
 
 type AnalyzeRaw = {
@@ -90,6 +67,7 @@ type AnalyzeRaw = {
   bbox: { x: number; y: number; w: number; h: number };
   inference_ms: number;
   engine: string;
+  model?: string | null;
   scores: { code: string; score: number }[];
   guide?: { meaning: string; destination: string; actions: string[]; tip: string };
 };
@@ -98,9 +76,8 @@ export const scanRepository = {
   async analyzePhoto(file: File): Promise<VisionHit> {
     const token = sessionRepository.token();
     const raw = await apiUpload<AnalyzeRaw>("/api/analyze", file, token);
-    const material = materialByCode(raw.material_code);
     return {
-      material,
+      material: materialByCode(raw.material_code),
       confidence: raw.confidence,
       bbox: raw.bbox,
       inferenceMs: raw.inference_ms,
@@ -108,6 +85,7 @@ export const scanRepository = {
       scores: raw.scores,
       segmented: true,
       engine: raw.engine,
+      model: raw.model ?? undefined,
       guide: raw.guide,
     };
   },
@@ -118,15 +96,10 @@ export const scanRepository = {
   },
   async create(draft: ScanDraft, file?: File | null): Promise<Scan> {
     const token = sessionRepository.token();
-    try {
-      const row = file
-        ? await apiUpload<ApiScan>("/api/scans", file, token, toFields(draft), "No se pudo guardar el escaneo")
-        : await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(draft)) }, token);
-      return mapScan(row);
-    } catch (error) {
-      if (!isOffline(error)) throw error;
-      return this.keepLocal(draft);
-    }
+    const row = file
+      ? await apiUpload<ApiScan>("/api/scans", file, token, toFields(draft), "No se pudo guardar el escaneo")
+      : await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(draft)) }, token);
+    return mapScan(row);
   },
   async photo(id: number): Promise<string | null> {
     const token = sessionRepository.token();
@@ -139,40 +112,6 @@ export const scanRepository = {
     } catch {
       return null;
     }
-  },
-  keepLocal(draft: ScanDraft): Scan {
-    const material = materialByCode(draft.materialCode);
-    const scan = scanFromMaterial(material, draft, -Date.now());
-    const pending = readPending();
-    pending.push({ ...draft, clientId: scan.id });
-    localStorage.setItem(QUEUE, JSON.stringify(pending));
-    const local = readLocal();
-    local.unshift(scan);
-    localStorage.setItem(LOCAL, JSON.stringify(local));
-    return scan;
-  },
-  localScans(): Scan[] {
-    return readLocal();
-  },
-  async flush(): Promise<void> {
-    const token = sessionRepository.token();
-    if (!token) return;
-    const pending = readPending();
-    if (!pending.length) return;
-    const left: Pending[] = [];
-    const synced = new Set<number>();
-    for (const item of pending) {
-      try {
-        await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(item)) }, token);
-        synced.add(item.clientId);
-      } catch (error) {
-        if (isOffline(error)) left.push(item);
-        else synced.add(item.clientId);
-      }
-    }
-    localStorage.setItem(QUEUE, JSON.stringify(left));
-    const local = readLocal().filter((scan) => !synced.has(scan.id));
-    localStorage.setItem(LOCAL, JSON.stringify(local));
   },
 };
 
@@ -191,35 +130,5 @@ function toBody(draft: ScanDraft) {
     object_name: draft.objectName,
     confidence: draft.confidence,
     separated_well: draft.separatedWell,
-  };
-}
-
-function isOffline(error: unknown): boolean {
-  return error instanceof Error && (error.message.includes("Sin conexión") || ("status" in error && (error as { status: number }).status === 0));
-}
-
-function scanFromMaterial(material: Material, draft: ScanDraft, id: number): Scan {
-  return {
-    id,
-    materialCode: material.code,
-    materialName: material.name,
-    fullName: material.fullName,
-    category: material.category,
-    objectName: draft.objectName,
-    confidence: draft.confidence,
-    container: material.container,
-    containerDetail: material.containerDetail,
-    tone: material.tone,
-    steps: material.steps,
-    primaryAction: material.primaryAction,
-    points: 10,
-    weightKg: material.weightKg,
-    co2Kg: draft.separatedWell ? material.co2Kg : 0,
-    createdAt: new Date().toISOString(),
-    separatedWell: draft.separatedWell,
-    accent: material.accent,
-    warning: material.warning,
-    recyclable: material.recyclable,
-    local: true,
   };
 }

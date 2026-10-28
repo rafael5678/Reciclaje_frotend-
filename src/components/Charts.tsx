@@ -1,9 +1,9 @@
 import type { CategoryStat, DayStat } from "../models/types";
 
-export function WeeklyChart({ days, tone = "light" }: { days: DayStat[]; tone?: "light" | "dark" }) {
+export function WeeklyChart({ days }: { days: DayStat[] }) {
   const max = Math.max(1, ...days.map((day) => day.count));
   return (
-    <div className={tone === "dark" ? "chart is-dark" : "chart"}>
+    <div className="chart">
       {days.map((day) => (
         <div className="chart-col" key={day.label}>
           <span>{day.count}</span>

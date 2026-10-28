@@ -7,7 +7,7 @@ export function ScanPhoto({ scan, compact = false }: { scan: Scan; compact?: boo
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!scan.hasPhoto || scan.local) return;
+    if (!scan.hasPhoto) return;
     let alive = true;
     let url = "";
     scanRepository.photo(scan.id).then((next) => {
@@ -19,7 +19,7 @@ export function ScanPhoto({ scan, compact = false }: { scan: Scan; compact?: boo
       alive = false;
       if (url) URL.revokeObjectURL(url);
     };
-  }, [scan.id, scan.hasPhoto, scan.local]);
+  }, [scan.id, scan.hasPhoto]);
 
   return (
     <div className={compact ? "scan-photo compact" : "scan-photo"}>

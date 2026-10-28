@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session } from "../models/types";
 import { authService } from "../services/authService";
-import { scanService } from "../services/scanService";
 
 type SessionContextValue = {
   session: Session | null;
@@ -21,13 +20,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let alive = true;
-    authService.restore().then(async (next) => {
+    authService.restore().then((next) => {
       if (!alive) return;
-      if (next) {
-        setSession(next);
-        await scanService.flush();
-      }
-      if (alive) setReady(true);
+      if (next) setSession(next);
+      setReady(true);
     });
     return () => {
       alive = false;

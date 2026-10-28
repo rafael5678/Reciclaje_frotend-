@@ -62,7 +62,6 @@ export function ResultView() {
         ))}
       </section>
       {guide?.tip ? <p className="warning">{guide.tip}</p> : scan.warning ? <p className="warning">{scan.warning}</p> : null}
-      {scan.local ? <p className="hint">Guardado en este dispositivo. Se sincroniza cuando el servidor responda.</p> : null}
       <button className="cta" onClick={() => navigate(donePath)}>Aceptar</button>
       <button className="text-btn" onClick={() => navigate(scanPath)}>Escanear otro</button>
     </div>

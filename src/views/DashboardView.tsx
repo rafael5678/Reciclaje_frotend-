@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Delta, Legend, StackBar } from "../components/Charts";
 import { Icon } from "../components/Icons";
+import { LoadState } from "../components/LoadState";
 import { ScanPhoto } from "../components/ScanPhoto";
-import type { Impact } from "../models/types";
 import { formatAgo, formatKg, signedPercent } from "../services/format";
-import { impactService } from "../services/impactService";
-import { useSession } from "./SessionProvider";
+import { useImpact } from "./useImpact";
 
 export function DashboardView() {
-  const { revision } = useSession();
-  const [impact, setImpact] = useState<Impact | null>(null);
+  const { impact, error, retry } = useImpact();
 
-  useEffect(() => {
-    let alive = true;
-    impactService.get().then((data) => {
-      if (alive) setImpact(data);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [revision]);
-
-  if (!impact) return <p className="loading">Cargando tu impacto...</p>;
+  if (!impact) return <LoadState error={error} onRetry={retry} loading="Cargando tu impacto..." />;
 
   return (
     <div className="home-grid">
@@ -66,7 +53,7 @@ export function DashboardView() {
         <section className="panel-card impact-card">
           <header className="section-head">
             <h2>Tu impacto ambiental</h2>
-            <span className="chip">Últimos 7 días</span>
+            <span className="chip">{impact.last7} en 7 días</span>
           </header>
           <div className="impact-nums">
             <div>

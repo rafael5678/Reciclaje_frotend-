@@ -11,10 +11,4 @@ export const scanService = {
   register(draft: ScanDraft, file?: File | null): Promise<Scan> {
     return scanRepository.create(draft, file);
   },
-  flush(): Promise<void> {
-    return scanRepository.flush();
-  },
-  local(): Scan[] {
-    return scanRepository.localScans();
-  },
 };

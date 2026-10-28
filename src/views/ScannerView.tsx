@@ -5,6 +5,7 @@ import { Icon, stepIcon } from "../components/Icons";
 import { MATERIALS, materialByCode } from "../models/catalog";
 import type { BBox, VisionHit } from "../models/types";
 import { formatConfidence } from "../services/format";
+import { modelLabel } from "../services/healthService";
 import { scanService } from "../services/scanService";
 import { loadMira } from "../services/miraService";
 import { ScanBrain } from "../services/scanBrain";
@@ -33,7 +34,7 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
   const [camError, setCamError] = useState("");
   const [saveError, setSaveError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [ms, setMs] = useState(12);
+  const [ms, setMs] = useState<number | null>(null);
   const [miraReady, setMiraReady] = useState(false);
   const [trashReady, setTrashReady] = useState(false);
   const [camRetry, setCamRetry] = useState(0);
@@ -252,9 +253,9 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
         </button>
       </div>
       <div className="scan-badges">
-        <span className="badge">IA · {ms} ms</span>
+        <span className="badge">IA · {ms === null ? "—" : `${ms} ms`}</span>
         <span className="badge badge-live">{source === "photo" ? "FOTO" : "CÁMARA"}</span>
-        <span className="badge">{hit?.engine === "gemini" ? "Gemini + catálogo" : hit?.engine === "forma" ? "Forma del objeto" : miraReady && trashReady ? "MIRA + TrashNet" : "Cargando modelos"}</span>
+        <span className="badge">{hit?.engine === "gemini" ? modelLabel(hit.model ?? "gemini") : hit?.engine === "forma" ? "Forma del objeto" : miraReady && trashReady ? "MIRA + TrashNet" : "Cargando modelos"}</span>
       </div>
       {box && hit ? (
         <div className="bbox" style={{ left: `${box.x * 100}%`, top: `${box.y * 100}%`, width: `${box.w * 100}%`, height: `${box.h * 100}%` }}>
@@ -290,7 +291,7 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
             </div>
           </div>
         ) : null}
-        {reading ? <p className="hint">Gemini está viendo la foto y preparando qué hacer con el objeto…</p> : null}
+        {reading ? <p className="hint">Analizando la foto y preparando qué hacer con el objeto…</p> : null}
         {saveError && !hit ? <p className="sheet-error">{saveError}</p> : null}
         {!hit && !camError && !reading ? (
           <div className="scan-wait">

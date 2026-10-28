@@ -39,7 +39,6 @@ export type Scan = {
   warning: string;
   recyclable: boolean;
   hasPhoto?: boolean;
-  local?: boolean;
 };
 
 export type CategoryStat = {
@@ -75,6 +74,17 @@ export type User = {
   id: number;
   name: string;
   email: string;
+  guest?: boolean;
+};
+
+export type ServerHealth = {
+  state: "checking" | "online" | "offline";
+  database: boolean;
+  gemini: boolean;
+  models: { name: string; available: boolean; retryAt: number | null }[];
+  perMinute: number;
+  usedLastMinute: number;
+  error?: string;
 };
 
 export type Session = {
@@ -110,5 +120,6 @@ export type VisionHit = {
   scores: Score[];
   segmented: boolean;
   engine?: string;
+  model?: string;
   guide?: ObjectGuide;
 };

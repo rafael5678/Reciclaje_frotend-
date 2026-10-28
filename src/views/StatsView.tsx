@@ -1,29 +1,16 @@
-import { useEffect, useState } from "react";
 import { CategoryBars, Delta, StackBar, WeeklyChart } from "../components/Charts";
-import type { Impact } from "../models/types";
+import { LoadState } from "../components/LoadState";
 import { formatKg, formatPercent } from "../services/format";
-import { impactService } from "../services/impactService";
-import { useSession } from "./SessionProvider";
+import { useImpact } from "./useImpact";
 
 export function StatsView() {
-  const { revision } = useSession();
-  const [impact, setImpact] = useState<Impact | null>(null);
+  const { impact, error, retry } = useImpact();
 
-  useEffect(() => {
-    let alive = true;
-    impactService.get().then((data) => {
-      if (alive) setImpact(data);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [revision]);
-
-  if (!impact) return <p className="loading">Cargando estadísticas...</p>;
+  if (!impact) return <LoadState error={error} onRetry={retry} loading="Cargando estadísticas..." />;
 
   return (
     <div className="stats-page">
-      <header className="page-head light-text">
+      <header className="page-head">
         <div>
           <h1>Estadísticas</h1>
           <p>Lo que ya separaste, comparado con la semana anterior.</p>
@@ -37,11 +24,11 @@ export function StatsView() {
         <article><span>CO₂ evitado</span><strong>{formatKg(impact.co2Kg)}</strong></article>
       </section>
       <section className="mid-grid">
-        <article className="panel-card dark-card">
+        <article className="panel-card">
           <h2>Últimos 7 días</h2>
-          <WeeklyChart days={impact.weekly} tone="dark" />
+          <WeeklyChart days={impact.weekly} />
         </article>
-        <article className="panel-card dark-card">
+        <article className="panel-card">
           <h2>Por material</h2>
           <StackBar items={impact.categories} />
           <CategoryBars items={impact.categories} />

@@ -1,65 +1,64 @@
-import { useState } from "react";
-import { evaluateSample, readVisionMeta, sampleKinds, type SampleKind } from "../services/visionService";
+import { modelLabel } from "../services/healthService";
+import { readVisionMeta } from "../services/visionService";
+import { refreshServerHealth, useServerHealth } from "./useServerHealth";
 
 export function ModelView() {
   const meta = readVisionMeta();
-  const [rows, setRows] = useState<{ kind: SampleKind; got: string; confidence: number; ok: boolean }[]>([]);
-
-  function run() {
-    const next = sampleKinds().map((kind) => {
-      const hit = evaluateSample(kind);
-      const got = hit?.material.code ?? "—";
-      return { kind, got, confidence: hit?.confidence ?? 0, ok: got === kind };
-    });
-    setRows(next);
-  }
-
-  const passed = rows.filter((row) => row.ok).length;
+  const health = useServerHealth();
+  const ready = health.models.find((model) => model.available);
+  const state = health.state === "online" ? "Conectado" : health.state === "offline" ? "Sin conexión" : "Conectando…";
 
   return (
     <div className="model-page">
       <header className="page-head">
         <div>
           <h1>Cómo clasifica</h1>
-          <p>Gemini mira la foto, dice qué objeto es y explica en qué contenedor va. MIRA y TrashNet ayudan cuando no hay conexión con Gemini.</p>
+          <p>Gemini mira la foto y explica en qué contenedor va. Si Gemini se agota, MIRA y TrashNet clasifican en el servidor.</p>
         </div>
+        <button className="cta cta-inline" onClick={() => void refreshServerHealth()}>Actualizar estado</button>
       </header>
+      {health.state === "offline" ? <p className="sheet-error">{health.error}</p> : null}
       <section className="model-stats">
-        <article className="panel-card"><span>Estado</span><strong>Listo en la nube</strong></article>
-        <article className="panel-card"><span>Última inferencia</span><strong>{meta ? `${meta.ms} ms` : "Aún no corre"}</strong></article>
-        <article className="panel-card"><span>Motor</span><strong>Gemini + MIRA</strong></article>
+        <article className="panel-card"><span>Servidor</span><strong>{state}</strong></article>
+        <article className="panel-card"><span>Modelo activo</span><strong>{!health.gemini ? "Solo modelos locales" : ready ? modelLabel(ready.name) : "Gemini agotado"}</strong></article>
+        <article className="panel-card"><span>Peticiones este minuto</span><strong>{health.state === "online" ? `${health.usedLastMinute} de ${health.perMinute}` : "—"}</strong></article>
+      </section>
+      <section className="panel-card">
+        <header className="section-head">
+          <h2>Modelos de Gemini</h2>
+          <span>{meta ? `Último análisis en este equipo: ${meta.ms} ms` : "Aún no analizas nada en este equipo"}</span>
+        </header>
+        {health.models.length === 0 ? (
+          <p className="empty">{health.state === "online" ? "El servidor no tiene modelos configurados." : "Esperando al servidor."}</p>
+        ) : (
+          <ul className="model-list">
+            {health.models.map((model, index) => (
+              <li key={model.name} className={model.available ? "ok" : "bad"}>
+                <div>
+                  <strong>{modelLabel(model.name)}</strong>
+                  <small>{index === 0 ? "Principal" : "Respaldo"} · {model.name}</small>
+                </div>
+                <span>{model.available ? "Disponible" : `Agotado${model.retryAt ? `, vuelve ${formatClock(model.retryAt)}` : ""}`}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
       <section className="panel-card pipeline">
         <h2>Cómo decide</h2>
         <ol>
-          <li>MIRA, un YOLO11, localiza el residuo en cualquier parte del encuadre.</li>
-          <li>TrashNet mira el recorte: cartón, vidrio, metal, papel, plástico o basura.</li>
-          <li>Si hay tapa roja, hoja impresa, lápiz, celular o control, gana esa forma.</li>
-          <li>Los dos modelos se ponen de acuerdo y eligen el contenedor.</li>
-          <li>Gemini explica qué es el objeto, a qué contenedor va y qué tienes que hacer.</li>
-          <li>Si confirmas, el resultado se guarda en tu historial.</li>
+          <li>Subes una foto y el servidor la reduce a 384 px y la envía en resolución baja, para gastar pocos tokens.</li>
+          <li>Cada escaneo hace una sola petición, al modelo principal.</li>
+          <li>Si ese modelo ya no tiene cupo, la misma foto va al modelo de respaldo.</li>
+          <li>Nunca se pasa de {health.perMinute || "6"} peticiones por minuto. Si se llega al límite, clasifican MIRA y TrashNet en el servidor.</li>
+          <li>Si vuelves a subir la misma foto, se reutiliza el resultado y no se gasta otra petición.</li>
+          <li>Con la cámara en vivo, MIRA y TrashNet corren en tu navegador y no gastan Gemini.</li>
         </ol>
-      </section>
-      <section className="panel-card">
-        <header className="section-head">
-          <h2>Prueba con muestras locales</h2>
-          <button className="cta cta-inline" onClick={run}>Probar las 8 clases</button>
-        </header>
-        {rows.length > 0 ? (
-          <>
-            <p className="hint">{passed} de {rows.length} muestras coincidieron con su material.</p>
-            <ul className="sample-list">
-              {rows.map((row) => (
-                <li key={row.kind} className={row.ok ? "ok" : "bad"}>
-                  <b>{row.kind}</b>
-                  <span>detectó {row.got}</span>
-                  <small>{Math.round(row.confidence * 100)}%</small>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : <p className="empty">Genera ocho imágenes de prueba en el navegador y clasifícalas sin cámara.</p>}
       </section>
     </div>
   );
+}
+
+function formatClock(unix: number): string {
+  return new Date(unix * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
 }
