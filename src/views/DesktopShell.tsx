@@ -49,10 +49,9 @@ function Topbar() {
     <header className="topbar">
       <div className="hello">
         <i />
-        <div>
-          <strong>¡Hola, {firstName(name)}!</strong>
-          <span>{guest ? "Estás probando EcoScan como invitado." : "Sigamos haciendo un mejor planeta."}</span>
-        </div>
+        <span>
+          <strong>¡Hola, {firstName(name)}!</strong> {guest ? "Estás probando EcoScan como invitado." : "Sigamos haciendo un mejor planeta 🌎"}
+        </span>
       </div>
       <div className="top-actions">
         {guest ? <Link to="/login?modo=registro" className="cta cta-inline cta-sm">Crear mi cuenta</Link> : null}

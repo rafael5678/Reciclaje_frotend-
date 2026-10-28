@@ -1,9 +1,17 @@
-export function Logo({ size = 42, tone = "dark" }: { size?: number; tone?: "dark" | "light" }) {
-  const tile = tone === "light" ? "#e7f8ef" : "#10241f";
+import { useId } from "react";
+
+export function Logo({ size = 42 }: { size?: number }) {
+  const id = useId().replace(/:/g, "");
   return (
     <svg className="logo-mark" width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <rect width="64" height="64" rx="18" fill={tile} />
-      <g transform="translate(16 16)" fill="none" stroke="#14c97a" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+      <defs>
+        <linearGradient id={`${id}-tile`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#1de28d" />
+          <stop offset="100%" stopColor="#19c5c5" />
+        </linearGradient>
+      </defs>
+      <rect width="64" height="64" rx="18" fill={`url(#${id}-tile)`} />
+      <g transform="translate(16 16)" fill="none" stroke="#053222" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 17l-2 2 2 2" />
         <path d="M10 19h9a2 2 0 0 0 1.75-2.75l-.55-1" />
         <path d="M8.5 11 7.8 8.3 5.1 9" />
@@ -15,10 +23,10 @@ export function Logo({ size = 42, tone = "dark" }: { size?: number; tone?: "dark
   );
 }
 
-export function Brand({ tone = "dark" }: { tone?: "dark" | "light" }) {
+export function Brand() {
   return (
-    <div className={tone === "light" ? "brand is-light" : "brand"}>
-      <Logo tone={tone} />
+    <div className="brand">
+      <Logo />
       <div>
         <strong>EcoScan</strong>
         <span>Recicla con inteligencia</span>

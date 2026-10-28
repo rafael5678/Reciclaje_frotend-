@@ -25,7 +25,11 @@ export type IconName =
   | "chevron"
   | "bin"
   | "logout"
-  | "spark";
+  | "spark"
+  | "mail"
+  | "lock"
+  | "eye"
+  | "eyeOff";
 
 export function Icon({ name, size = 22 }: { name: IconName; size?: number }) {
   return (
@@ -116,4 +120,29 @@ const paths: Record<IconName, ReactNode> = {
   bin: <path d="M5 8h14M9 8V6h6v2M7 8l1 12h8l1-12" />,
   logout: <path d="M10 7V5H5v14h5v-2M10 12h9M16 9l3 3-3 3" />,
   spark: <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.2 2.2M15.8 15.8 18 18M18 6l-2.2 2.2M8.2 15.8 6 18" />,
+  mail: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path d="m4 7 8 6 8-6" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="5" y="10" width="14" height="10" rx="2.5" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  eye: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  eyeOff: (
+    <>
+      <path d="M4 4l16 16" />
+      <path d="M10.6 6A9.7 9.7 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-3 3.7M6.6 7.6A16.5 16.5 0 0 0 2.5 12S6 18.5 12 18.5a9 9 0 0 0 4.3-1.1" />
+      <path d="M9.9 10a3 3 0 0 0 4.2 4.2" />
+    </>
+  ),
 };

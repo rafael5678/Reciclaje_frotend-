@@ -1,30 +1,44 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type PointerEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Earth } from "../components/Earth";
+import { Icon, type IconName } from "../components/Icons";
 import { Brand } from "../components/Logo";
+import { Planet } from "../components/Planet";
+import type { Session } from "../models/types";
 import { authService } from "../services/authService";
+import { prefersReducedMotion } from "../services/motion";
 import { useSession } from "./SessionProvider";
+
+const LEAVES = Array.from({ length: 9 }, (_, index) => index);
 
 export function LoginView() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { setSession } = useSession();
+  const card = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<"login" | "register">(params.get("modo") === "registro" ? "register" : "login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [shake, setShake] = useState(false);
 
-  async function run(action: () => Promise<Parameters<typeof setSession>[0]>) {
+  async function run(action: () => Promise<Session>) {
     setBusy(true);
     setError("");
     try {
-      setSession(await action());
-      navigate("/panel");
+      const session = await action();
+      setDone(true);
+      window.setTimeout(() => {
+        setSession(session);
+        navigate("/panel");
+      }, prefersReducedMotion() ? 0 : 650);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo entrar");
-    } finally {
+      setShake(true);
+      window.setTimeout(() => setShake(false), 500);
       setBusy(false);
     }
   }
@@ -34,46 +48,91 @@ export function LoginView() {
     void run(() => (mode === "login" ? authService.login(email, password) : authService.register(name, email, password)));
   }
 
+  function tilt(event: PointerEvent<HTMLElement>) {
+    if (!card.current || prefersReducedMotion() || event.pointerType !== "mouse") return;
+    const x = event.clientX / window.innerWidth - 0.5;
+    const y = event.clientY / window.innerHeight - 0.5;
+    card.current.style.setProperty("--ry", `${(x * 7).toFixed(2)}deg`);
+    card.current.style.setProperty("--rx", `${(-y * 7).toFixed(2)}deg`);
+  }
+
+  function resetTilt() {
+    card.current?.style.setProperty("--ry", "0deg");
+    card.current?.style.setProperty("--rx", "0deg");
+  }
+
+  const label = mode === "login" ? "Entrar" : "Crear cuenta";
+
   return (
-    <main className="welcome">
-      <section className="welcome-card auth-card">
+    <main className="auth" onPointerMove={tilt} onPointerLeave={resetTilt}>
+      <div className="aurora" aria-hidden="true"><i /><i /><i /></div>
+      <div className="leaf-rain" aria-hidden="true">
+        {LEAVES.map((index) => <span key={index} style={{ ["--i" as string]: index }} />)}
+      </div>
+      <section ref={card} className={`auth-card glass${shake ? " is-shake" : ""}${done ? " is-done" : ""}`}>
+        <div className="auth-planet">
+          <Planet spinning size={112} />
+          <span className="auth-orbit" />
+        </div>
         <Brand />
-        <Earth className="welcome-earth small" />
-        <h1>{mode === "login" ? "Iniciar sesión" : "Crear cuenta"}</h1>
-        <p>Con tu cuenta, cada escaneo queda guardado en tu historial.</p>
-        <form onSubmit={submit} className="form">
+        <div className="auth-tabs" role="tablist" data-mode={mode}>
+          <span className="auth-tabs-pill" />
+          <button role="tab" type="button" aria-selected={mode === "login"} onClick={() => { setMode("login"); setError(""); }}>Iniciar sesión</button>
+          <button role="tab" type="button" aria-selected={mode === "register"} onClick={() => { setMode("register"); setError(""); }}>Crear cuenta</button>
+        </div>
+        <p className="auth-lead">
+          {mode === "login" ? "Qué bueno verte de nuevo. Tu historial te espera." : "Crea tu cuenta y guarda cada residuo que separes."}
+        </p>
+        <form onSubmit={submit} className="form auth-form" key={mode}>
           {mode === "register" ? (
-            <label className="field">
-              Nombre
-              <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} autoComplete="name" />
-            </label>
+            <Field icon="user" label="Nombre">
+              <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} autoComplete="name" placeholder=" " />
+            </Field>
           ) : null}
-          <label className="field">
-            Correo
-            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" />
-          </label>
-          <label className="field">
-            Contraseña
+          <Field icon="mail" label="Correo">
+            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" placeholder=" " />
+          </Field>
+          <Field
+            icon="lock"
+            label="Contraseña"
+            action={
+              <button type="button" className="field-eye" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                <Icon name={showPassword ? "eyeOff" : "eye"} size={18} />
+              </button>
+            }
+          >
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
               minLength={6}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
+              placeholder=" "
             />
-          </label>
-          {error ? <p className="sheet-error">{error}</p> : null}
-          <button className="cta" disabled={busy}>{busy ? "Espera..." : mode === "login" ? "Entrar" : "Crear cuenta"}</button>
+          </Field>
+          {error ? <p className="sheet-error auth-error" role="alert">{error}</p> : null}
+          <button className="cta cta-glow auth-submit" disabled={busy}>
+            {done ? <><Icon name="check" size={18} /> ¡Listo!</> : busy ? <span className="spinner" aria-label="Cargando" /> : label}
+          </button>
         </form>
+        <div className="auth-divider"><span>o</span></div>
         <button className="ghost-btn" type="button" disabled={busy} onClick={() => void run(() => authService.guest())}>
-          Probar como invitado
+          🌱 Probar como invitado
         </button>
-        <button className="ghost-link" type="button" onClick={() => setMode(mode === "login" ? "register" : "login")}>
-          {mode === "login" ? "Crear una cuenta nueva" : "Ya tengo cuenta"}
-        </button>
-        <Link className="ghost-link dim" to="/">Volver</Link>
+        <Link className="ghost-link dim" to="/">Volver al inicio</Link>
       </section>
     </main>
+  );
+}
+
+function Field({ icon, label, action, children }: { icon: IconName; label: string; action?: ReactNode; children: ReactNode }) {
+  return (
+    <label className="float-field">
+      <Icon name={icon} size={18} />
+      {children}
+      <span>{label}</span>
+      {action}
+    </label>
   );
 }
