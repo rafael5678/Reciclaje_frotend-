@@ -4,6 +4,7 @@ import { BinPill, CategoryBars, WeeklyChart } from "../components/Charts";
 import { ScanPhoto } from "../components/ScanPhoto";
 import { Icon } from "../components/Icons";
 import type { Impact, Scan } from "../models/types";
+import { exportExcel } from "../services/exportService";
 import { formatPercent, formatWhen } from "../services/format";
 import { impactService } from "../services/impactService";
 import { scanService } from "../services/scanService";
@@ -12,7 +13,7 @@ import { useSession } from "./SessionProvider";
 const FILTERS = ["Todos", "Plástico", "Papel y cartón", "Vidrio", "Metal", "Orgánico", "General"];
 
 export function ScansView() {
-  const { revision } = useSession();
+  const { revision, session } = useSession();
   const [impact, setImpact] = useState<Impact | null>(null);
   const [scans, setScans] = useState<Scan[]>([]);
   const [filter, setFilter] = useState("Todos");
@@ -46,10 +47,24 @@ export function ScansView() {
           <h1>Mis escaneos</h1>
           <p>Tu historial vive en tu cuenta. Aquí ves cuántos objetos llevas y cómo los separas.</p>
         </div>
-        <Link className="cta cta-inline" to="/panel/escanear">
-          <Icon name="camera" size={18} />
-          Escanear residuo
-        </Link>
+        <div className="head-actions">
+          <button
+            className="ghost-btn"
+            disabled={!impact}
+            onClick={() => impact && exportExcel(session?.user.guest ? "Invitado" : session?.user.name ?? "", impact, scans)}
+          >
+            <Icon name="download" size={16} />
+            Excel
+          </button>
+          <Link className="ghost-btn" to="/reporte" target="_blank">
+            <Icon name="download" size={16} />
+            PDF
+          </Link>
+          <Link className="cta cta-inline" to="/panel/escanear">
+            <Icon name="camera" size={18} />
+            Escanear residuo
+          </Link>
+        </div>
       </header>
       {error ? <p className="sheet-error">{error}</p> : null}
       <section className="summary">

@@ -21,7 +21,8 @@ export async function api<T>(path: string, options: RequestInit = {}, token?: st
   const headers = new Headers(options.headers);
   if (!headers.has("Content-Type") && options.body) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
-  const retries = (options.method ?? "GET").toUpperCase() === "GET" ? RETRY_DELAYS : [];
+  const isGet = (options.method ?? "GET").toUpperCase() === "GET";
+  const retries = isGet ? RETRY_DELAYS : [3000];
 
   const response = await send(() => fetch(apiUrl(path), { ...options, headers }), retries);
   if (!response.ok) {
@@ -46,7 +47,7 @@ export async function apiUpload<T>(
   }
   body.append("file", file, file.name || "foto.jpg");
 
-  const response = await send(() => fetch(apiUrl(path), { method: "POST", headers, body }), []);
+  const response = await send(() => fetch(apiUrl(path), { method: "POST", headers, body }), [3000]);
   if (!response.ok) throw new ApiError(response.status, await readError(response, failure));
   return readJson<T>(response);
 }

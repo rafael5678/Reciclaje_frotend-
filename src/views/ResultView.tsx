@@ -1,4 +1,5 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { kindForMaterial } from "../services/pointsService";
 import { Icon, stepIcon } from "../components/Icons";
 import { WasteArt } from "../components/WasteArt";
 import type { ObjectGuide, Scan } from "../models/types";
@@ -62,6 +63,10 @@ export function ResultView() {
         ))}
       </section>
       {guide?.tip ? <p className="warning">{guide.tip}</p> : scan.warning ? <p className="warning">{scan.warning}</p> : null}
+      <Link className="ghost-btn points-link" to={`/panel/puntos?tipo=${encodeURIComponent(kindForMaterial(scan.materialCode))}`}>
+        <Icon name="map" size={16} />
+        ¿Dónde lo llevo? Ver puntos cercanos
+      </Link>
       <button className="cta" onClick={() => navigate(donePath)}>Aceptar</button>
       <button className="text-btn" onClick={() => navigate(scanPath)}>Escanear otro</button>
     </div>

@@ -15,7 +15,7 @@ export function ProfileView() {
       <div className="profile-hero">
         <span className="avatar lg">{initials(name)}</span>
         <h1>{name}</h1>
-        <p>{guest ? "Modo invitado: si cierras sesión, pierdes estos escaneos" : session?.user.email}</p>
+        <p>{guest ? "Modo invitado · Crea tu cuenta para conservar y pasar tus escaneos" : session?.user.email}</p>
       </div>
       {error ? <p className="sheet-error">{error}</p> : null}
       <section className="profile-stats">
@@ -24,8 +24,11 @@ export function ProfileView() {
         <div><strong>{impact ? formatKg(impact.co2Kg) : "—"}</strong><span>CO₂ evitado</span></div>
       </section>
       <div className="profile-links">
-        {guest ? <Link to="/login?modo=registro">Crear mi cuenta</Link> : null}
-        <Link to="/panel">Abrir panel de escritorio</Link>
+        {guest ? <Link to="/login?modo=registro">Crear cuenta (conservar escaneos)</Link> : null}
+        <Link to="/panel/puntos">Puntos de reciclaje en el mapa</Link>
+        <Link to="/panel/salones">Salones y ranking</Link>
+        <Link to="/panel/historial">Historial y exportar</Link>
+        <Link to="/panel">Abrir panel completo</Link>
         <Link to="/app/guia">Ver guía de materiales</Link>
         <button
           onClick={() => {

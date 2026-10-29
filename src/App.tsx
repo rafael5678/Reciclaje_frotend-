@@ -1,3 +1,4 @@
+import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Logo } from "./components/Logo";
 import { DesktopScanView } from "./views/DesktopScanView";
@@ -16,6 +17,14 @@ import { SettingsView } from "./views/SettingsView";
 import { StatsView } from "./views/StatsView";
 import { useSession } from "./views/SessionProvider";
 import { WelcomeView } from "./views/WelcomeView";
+
+const ClassroomsView = lazy(() => import("./views/ClassroomsView").then((module) => ({ default: module.ClassroomsView })));
+const PointsView = lazy(() => import("./views/PointsView").then((module) => ({ default: module.PointsView })));
+const ReportView = lazy(() => import("./views/ReportView").then((module) => ({ default: module.ReportView })));
+
+function Later({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<p className="loading">Cargando…</p>}>{children}</Suspense>;
+}
 
 export function App() {
   return (
@@ -40,7 +49,10 @@ export function App() {
           <Route path="estadisticas" element={<StatsView />} />
           <Route path="configuracion" element={<SettingsView />} />
           <Route path="resultado" element={<ResultView />} />
+          <Route path="puntos" element={<Later><PointsView /></Later>} />
+          <Route path="salones" element={<Later><ClassroomsView /></Later>} />
         </Route>
+        <Route path="/reporte" element={<Later><ReportView /></Later>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

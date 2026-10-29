@@ -52,7 +52,7 @@ export function WelcomeView() {
     setBusy(true);
     setError("");
     try {
-      setSession(await authService.guest());
+      setSession((await authService.guest()).session);
       navigate(path);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No pude entrar");

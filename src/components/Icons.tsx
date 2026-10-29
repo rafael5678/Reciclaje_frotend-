@@ -29,7 +29,12 @@ export type IconName =
   | "mail"
   | "lock"
   | "eye"
-  | "eyeOff";
+  | "eyeOff"
+  | "download"
+  | "users"
+  | "map"
+  | "copy"
+  | "pin";
 
 export function Icon({ name, size = 22 }: { name: IconName; size?: number }) {
   return (
@@ -136,6 +141,28 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
       <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  download: <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />,
+  users: (
+    <>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 19c.9-3 3-4.5 5.5-4.5s4.6 1.5 5.5 4.5" />
+      <circle cx="17" cy="9" r="2.4" />
+      <path d="M15.8 14.2c2.2-.2 4 .9 4.7 3.6" />
+    </>
+  ),
+  map: <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20zM9 4v13.5M15 6.5V20" />,
+  copy: (
+    <>
+      <rect x="8" y="8" width="12" height="12" rx="2.5" />
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+    </>
+  ),
+  pin: (
+    <>
+      <path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" />
+      <circle cx="12" cy="9.5" r="2.5" />
     </>
   ),
   eyeOff: (

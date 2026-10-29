@@ -3,8 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Icon, type IconName } from "../components/Icons";
 import { Brand } from "../components/Logo";
 import { Planet } from "../components/Planet";
-import type { Session } from "../models/types";
-import { authService } from "../services/authService";
+import { authService, type AuthResult } from "../services/authService";
 import { prefersReducedMotion } from "../services/motion";
 import { useSession } from "./SessionProvider";
 
@@ -13,7 +12,7 @@ const LEAVES = Array.from({ length: 9 }, (_, index) => index);
 export function LoginView() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { setSession } = useSession();
+  const { session: current, setSession } = useSession();
   const card = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<"login" | "register">(params.get("modo") === "registro" ? "register" : "login");
   const [name, setName] = useState("");
@@ -24,17 +23,20 @@ export function LoginView() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [shake, setShake] = useState(false);
+  const [moved, setMoved] = useState(0);
+  const fromGuest = Boolean(current?.user.guest);
 
-  async function run(action: () => Promise<Session>) {
+  async function run(action: () => Promise<AuthResult>) {
     setBusy(true);
     setError("");
     try {
-      const session = await action();
+      const { session, moved: count } = await action();
+      setMoved(count);
       setDone(true);
       window.setTimeout(() => {
         setSession(session);
         navigate("/panel");
-      }, prefersReducedMotion() ? 0 : 650);
+      }, prefersReducedMotion() ? 0 : count ? 1600 : 650);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo entrar");
       setShake(true);
@@ -83,6 +85,8 @@ export function LoginView() {
         <p className="auth-lead">
           {mode === "login" ? "Qué bueno verte de nuevo. Tu historial te espera." : "Crea tu cuenta y guarda cada residuo que separes."}
         </p>
+        {fromGuest ? <p className="auth-guest-note">🌱 Estás como invitado: al entrar o crear tu cuenta, tus escaneos de invitado pasan a ella.</p> : null}
+        {done && moved ? <p className="auth-moved" role="status">Pasamos {moved} {moved === 1 ? "escaneo" : "escaneos"} de invitado a tu cuenta.</p> : null}
         <form onSubmit={submit} className="form auth-form" key={mode}>
           {mode === "register" ? (
             <Field icon="user" label="Nombre">
@@ -117,9 +121,15 @@ export function LoginView() {
           </button>
         </form>
         <div className="auth-divider"><span>o</span></div>
-        <button className="ghost-btn" type="button" disabled={busy} onClick={() => void run(() => authService.guest())}>
-          🌱 Probar como invitado
-        </button>
+        {fromGuest ? (
+          <button className="ghost-btn" type="button" disabled={busy} onClick={() => navigate("/panel")}>
+            Seguir como invitado
+          </button>
+        ) : (
+          <button className="ghost-btn" type="button" disabled={busy} onClick={() => void run(() => authService.guest())}>
+            🌱 Probar como invitado
+          </button>
+        )}
         <Link className="ghost-link dim" to="/">Volver al inicio</Link>
       </section>
     </main>
