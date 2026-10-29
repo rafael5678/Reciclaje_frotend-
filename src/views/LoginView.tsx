@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent, type PointerEvent, type ReactNode } f
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Icon, type IconName } from "../components/Icons";
 import { Brand } from "../components/Logo";
+import { ServerBar } from "../components/ServerBar";
 import { Planet } from "../components/Planet";
 import { authService, type AuthResult } from "../services/authService";
 import { prefersReducedMotion } from "../services/motion";
@@ -116,6 +117,7 @@ export function LoginView() {
             />
           </Field>
           {error ? <p className="sheet-error auth-error" role="alert">{error}</p> : null}
+          {error ? <ServerBar /> : null}
           <button className="cta cta-glow auth-submit" disabled={busy}>
             {done ? <><Icon name="check" size={18} /> ¡Listo!</> : busy ? <span className="spinner" aria-label="Cargando" /> : label}
           </button>

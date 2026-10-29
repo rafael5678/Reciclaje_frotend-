@@ -709,6 +709,11 @@ td:first-child { display: flex; align-items: center; gap: 8px; }
 .welcome-copy { position: relative; z-index: 1; text-align: center; max-width: 760px; margin-top: 6px; }
 .welcome-copy h1 { font-size: clamp(32px, 5vw, 54px); line-height: 1.08; letter-spacing: -0.045em; font-weight: 800; }
 .welcome-copy > p { color: #9eb2aa; line-height: 1.5; max-width: 470px; margin: 12px auto 0; }
+.server-bar { text-align: left; max-width: 520px; margin: 14px auto; padding: 12px 14px; border-radius: 16px; background: rgba(8, 24, 20, 0.45); border: 1px solid rgba(255, 180, 168, 0.25); display: grid; gap: 8px; }
+.server-bar p, .server-bar small { margin: 0; color: #d5eee4; font-size: 13px; line-height: 1.4; }
+.server-bar-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.server-bar-row input { flex: 1; min-width: 180px; }
+.auth-card .server-bar { margin: 0 0 12px; }
 .cta-xl { display: flex; width: min(380px, 100%); margin: 22px auto 8px; padding: 18px; font-size: 17px; }
 .welcome-copy .ghost-link { display: block; margin: 4px auto 0; }
 @media (min-width: 1040px) {

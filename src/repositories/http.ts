@@ -93,12 +93,18 @@ async function readJson<T>(response: Response): Promise<T> {
 
 async function readError(response: Response, fallback: string): Promise<string> {
   if (response.status === 404) {
-    return "Esta ruta no está en el servidor. Vuelve a desplegar el backend de EcoScan en Render.";
+    const url = response.url || "";
+    if (url.includes("/auth/guest")) {
+      return "El modo invitado aún no está en el servidor público. Entra con tu cuenta (Iniciar sesión) o vuelve a desplegar Reciclaje_backend- en Render.";
+    }
+    if (url.includes("/classrooms")) {
+      return "Los salones aún no están en el servidor público. En Render, abre tu API de EcoScan y pulsa Manual Deploy del último commit.";
+    }
   }
   try {
     return readDetail(await response.json(), fallback);
   } catch {
-    return fallback;
+    return response.status === 404 ? "El servidor no tiene esa función. Revisa la URL de Render o vuelve a desplegar el backend." : fallback;
   }
 }
 
