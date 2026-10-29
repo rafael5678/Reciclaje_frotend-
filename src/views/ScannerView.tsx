@@ -6,6 +6,7 @@ import { MATERIALS, materialByCode } from "../models/catalog";
 import type { BBox, VisionHit } from "../models/types";
 import { formatConfidence } from "../services/format";
 import { modelLabel } from "../services/healthService";
+import { compactPhoto } from "../services/photo";
 import { scanService } from "../services/scanService";
 import { loadMira } from "../services/miraService";
 import { ScanBrain } from "../services/scanBrain";
@@ -162,9 +163,10 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
 
   async function pickPhoto(file: File | undefined) {
     if (!file) return;
-    photoFile.current = file;
+    const compact = await compactPhoto(file);
+    photoFile.current = compact;
     if (photoUrl) URL.revokeObjectURL(photoUrl);
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(compact);
     const job = photoJob.current + 1;
     photoJob.current = job;
     setPhotoUrl(url);
@@ -175,7 +177,7 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
     setManual(false);
     setCorrecting(false);
     try {
-      const next = await scanService.analyzePhoto(file);
+      const next = await scanService.analyzePhoto(compact);
       if (job !== photoJob.current) return;
       setMs(Math.max(1, Math.round(next.inferenceMs || 1)));
       setHit(next);

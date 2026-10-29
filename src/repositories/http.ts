@@ -8,21 +8,33 @@ export class ApiError extends Error {
 }
 
 const OFFLINE = "Sin conexión con el servidor";
-const MISCONFIGURED = "La app no encuentra la API. Revisa VITE_API_URL en Vercel";
-// Render apaga el servidor gratuito si no se usa; el primer pedido puede tardar en despertarlo.
-const RETRY_DELAYS = [2500, 6000];
+const MISCONFIGURED = "La URL de la API no apunta a EcoScan. Pégala en Configuración o en VITE_API_URL de Vercel.";
+const STORAGE_KEY = "ecoscan.apiUrl";
+const GET_RETRIES = [2500, 8000];
+const REQUEST_MS = 90_000;
+
+export function getApiBase() {
+  const override = (typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY) : "") || "";
+  const env = String(import.meta.env.VITE_API_URL || "");
+  return (override || env).trim().replace(/\/$/, "");
+}
+
+export function setApiBase(url: string) {
+  const next = url.trim().replace(/\/$/, "");
+  if (next) localStorage.setItem(STORAGE_KEY, next);
+  else localStorage.removeItem(STORAGE_KEY);
+}
 
 export function apiUrl(path: string) {
-  const base = String(import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-  return `${base}${path}`;
+  return `${getApiBase()}${path}`;
 }
 
 export async function api<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
   const headers = new Headers(options.headers);
   if (!headers.has("Content-Type") && options.body) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
-  const isGet = (options.method ?? "GET").toUpperCase() === "GET";
-  const retries = isGet ? RETRY_DELAYS : [3000];
+  const method = (options.method ?? "GET").toUpperCase();
+  const retries = method === "GET" ? GET_RETRIES : [];
 
   const response = await send(() => fetch(apiUrl(path), { ...options, headers }), retries);
   if (!response.ok) {
@@ -47,7 +59,7 @@ export async function apiUpload<T>(
   }
   body.append("file", file, file.name || "foto.jpg");
 
-  const response = await send(() => fetch(apiUrl(path), { method: "POST", headers, body }), [3000]);
+  const response = await send(() => fetch(apiUrl(path), { method: "POST", headers, body }), []);
   if (!response.ok) throw new ApiError(response.status, await readError(response, failure));
   return readJson<T>(response);
 }
@@ -55,12 +67,22 @@ export async function apiUpload<T>(
 async function send(run: () => Promise<Response>, retries: number[]): Promise<Response> {
   for (let attempt = 0; ; attempt += 1) {
     try {
-      return await run();
-    } catch {
-      if (attempt >= retries.length) throw new ApiError(0, OFFLINE);
+      return await withTimeout(run());
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      if (attempt >= retries.length) {
+        throw new ApiError(0, getApiBase() ? OFFLINE : MISCONFIGURED);
+      }
       await wait(retries[attempt]);
     }
   }
+}
+
+function withTimeout(promise: Promise<Response>): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new ApiError(0, "El servidor tardó demasiado. Si está en Render, espera a que despierte e inténtalo otra vez.")), REQUEST_MS);
+    promise.then(resolve, reject).finally(() => window.clearTimeout(timer));
+  });
 }
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -70,6 +92,9 @@ async function readJson<T>(response: Response): Promise<T> {
 }
 
 async function readError(response: Response, fallback: string): Promise<string> {
+  if (response.status === 404) {
+    return "Esta ruta no está en el servidor. Vuelve a desplegar el backend de EcoScan en Render.";
+  }
   try {
     return readDetail(await response.json(), fallback);
   } catch {

@@ -33,9 +33,10 @@ export function PointsView() {
   useEffect(() => {
     if (!mapNode.current || map.current) return;
     const instance = L.map(mapNode.current, { zoomControl: true, attributionControl: true }).setView([4.6, -74.1], 5);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      className: "osm-dark",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(instance);
     layer.current = L.layerGroup().addTo(instance);
     map.current = instance;

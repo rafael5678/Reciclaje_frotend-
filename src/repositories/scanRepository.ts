@@ -96,10 +96,18 @@ export const scanRepository = {
   },
   async create(draft: ScanDraft, file?: File | null): Promise<Scan> {
     const token = sessionRepository.token();
-    const row = file
-      ? await apiUpload<ApiScan>("/api/scans", file, token, toFields(draft), "No se pudo guardar el escaneo")
-      : await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(draft)) }, token);
-    return mapScan(row);
+    if (file) {
+      try {
+        return mapScan(await apiUpload<ApiScan>("/api/scans", file, token, toFields(draft), "No se pudo guardar el escaneo"));
+      } catch (first) {
+        try {
+          return mapScan(await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(draft)) }, token));
+        } catch {
+          throw first;
+        }
+      }
+    }
+    return mapScan(await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(draft)) }, token));
   },
   async photo(id: number): Promise<string | null> {
     const token = sessionRepository.token();
