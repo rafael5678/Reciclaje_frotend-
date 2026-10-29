@@ -234,7 +234,7 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
       {source === "camera" ? (
         <video ref={videoRef} className={facing === "user" ? "scan-video mirror" : "scan-video"} playsInline muted autoPlay />
       ) : photoUrl ? (
-        <img ref={photoRef} src={photoUrl} alt="Foto a analizar" className="scan-photo" />
+        <img ref={photoRef} src={photoUrl} alt="Foto a analizar" className="scan-photo" style={{ objectFit: "contain" }} />
       ) : (
         <div className="scan-drop">
           <Icon name="scan" />
