@@ -2,7 +2,7 @@ import { useId } from "react";
 
 type Center = "recycle" | "camera" | "network";
 
-export function RecycleBag({ center = "recycle" }: { center?: Center }) {
+export function RecycleBag({ center = "recycle", float = true }: { center?: Center; float?: boolean }) {
   const id = useId().replace(/:/g, "");
   return (
     <svg className="recycle-bag" viewBox="0 0 300 320" aria-hidden="true">
@@ -18,35 +18,39 @@ export function RecycleBag({ center = "recycle" }: { center?: Center }) {
       </defs>
       <circle cx="150" cy="200" r="150" fill={`url(#${id}-glow)`} />
 
-      <g className="bag-item" style={{ ["--r" as string]: "-24deg", ["--d" as string]: "0s" }}>
-        <g transform="translate(92 62)">
-          <rect x="-11" y="-30" width="22" height="58" rx="8" fill="#4cc3f0" />
-          <rect x="-6" y="-40" width="12" height="11" rx="2" fill="#2b8fd6" />
-          <rect x="-11" y="-6" width="22" height="12" fill="#e4f7ff" opacity="0.75" />
-        </g>
-      </g>
-      <g className="bag-item" style={{ ["--r" as string]: "8deg", ["--d" as string]: "-1.2s" }}>
-        <g transform="translate(150 46)">
-          <rect x="-22" y="-30" width="44" height="58" rx="4" fill="#f4fbf8" />
-          <path d="M-13 -14H13M-13 -4H13M-13 6H6" stroke="#9fb7ae" strokeWidth="3" strokeLinecap="round" />
-        </g>
-      </g>
-      <g className="bag-item" style={{ ["--r" as string]: "4deg", ["--d" as string]: "-2.4s" }}>
-        <g transform="translate(212 66)">
-          <rect x="-18" y="-30" width="36" height="58" rx="6" fill="#d7e2e8" />
-          <rect x="-18" y="-10" width="36" height="18" fill="#2fe39a" />
-          <ellipse cx="0" cy="-30" rx="18" ry="5" fill="#eef4f7" />
-        </g>
-      </g>
-      <g className="bag-item" style={{ ["--r" as string]: "-18deg", ["--d" as string]: "-0.6s" }}>
-        <path transform="translate(62 128)" d="M-18 0C-10 -16 12 -16 18 0C10 14 -12 14 -18 0Z" fill="#8ff0b2" />
-      </g>
-      <g className="bag-item" style={{ ["--r" as string]: "-30deg", ["--d" as string]: "-1.8s" }}>
-        <g transform="translate(240 122)">
-          <path d="M-18 0C-10 -16 12 -16 18 0C10 14 -12 14 -18 0Z" fill="#2fe39a" />
-          <path d="M-12 8 12 -8" stroke="#f4fbf8" strokeWidth="3" strokeLinecap="round" />
-        </g>
-      </g>
+      {float ? (
+        <>
+          <g className="bag-item" style={{ ["--r" as string]: "-24deg", ["--d" as string]: "0s" }}>
+            <g transform="translate(92 62)">
+              <rect x="-11" y="-30" width="22" height="58" rx="8" fill="#4cc3f0" />
+              <rect x="-6" y="-40" width="12" height="11" rx="2" fill="#2b8fd6" />
+              <rect x="-11" y="-6" width="22" height="12" fill="#e4f7ff" opacity="0.75" />
+            </g>
+          </g>
+          <g className="bag-item" style={{ ["--r" as string]: "8deg", ["--d" as string]: "-1.2s" }}>
+            <g transform="translate(150 46)">
+              <rect x="-22" y="-30" width="44" height="58" rx="4" fill="#f4fbf8" />
+              <path d="M-13 -14H13M-13 -4H13M-13 6H6" stroke="#9fb7ae" strokeWidth="3" strokeLinecap="round" />
+            </g>
+          </g>
+          <g className="bag-item" style={{ ["--r" as string]: "4deg", ["--d" as string]: "-2.4s" }}>
+            <g transform="translate(212 66)">
+              <rect x="-18" y="-30" width="36" height="58" rx="6" fill="#d7e2e8" />
+              <rect x="-18" y="-10" width="36" height="18" fill="#2fe39a" />
+              <ellipse cx="0" cy="-30" rx="18" ry="5" fill="#eef4f7" />
+            </g>
+          </g>
+          <g className="bag-item" style={{ ["--r" as string]: "-18deg", ["--d" as string]: "-0.6s" }}>
+            <path transform="translate(62 128)" d="M-18 0C-10 -16 12 -16 18 0C10 14 -12 14 -18 0Z" fill="#8ff0b2" />
+          </g>
+          <g className="bag-item" style={{ ["--r" as string]: "-30deg", ["--d" as string]: "-1.8s" }}>
+            <g transform="translate(240 122)">
+              <path d="M-18 0C-10 -16 12 -16 18 0C10 14 -12 14 -18 0Z" fill="#2fe39a" />
+              <path d="M-12 8 12 -8" stroke="#f4fbf8" strokeWidth="3" strokeLinecap="round" />
+            </g>
+          </g>
+        </>
+      ) : null}
 
       <g className="bag-body">
         <path d="M104 156 C 104 104, 196 104, 196 156" stroke="#18a891" strokeWidth="13" fill="none" strokeLinecap="round" />

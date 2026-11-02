@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { CountUp } from "../components/CountUp";
 import { Icon } from "../components/Icons";
 import { LoadState } from "../components/LoadState";
-import { RecycleBag } from "../components/RecycleBag";
+import { RecyclePlay } from "../components/RecyclePlay";
 import { ScanPhoto } from "../components/ScanPhoto";
 import { StatTile } from "../components/StatTile";
 import { formatAgo, signedPercent } from "../services/format";
@@ -29,7 +29,7 @@ export function DashboardView() {
           <StatTile emoji="🌿" value={<CountUp value={impact.co2Kg} decimals={1} suffix=" kg" />} label="CO₂ evitado" />
         </div>
         <div className="bag-stage">
-          <RecycleBag center="recycle" />
+          <RecyclePlay />
           <Link className="cta cta-glow" to="/panel/escanear">
             <Icon name="camera" size={18} />
             Escanear ahora

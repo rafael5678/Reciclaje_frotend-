@@ -814,6 +814,32 @@ td:first-child { display: flex; align-items: center; gap: 8px; }
 .stat-tile strong { display: block; font-size: 22px; letter-spacing: -0.03em; }
 .stat-tile div > span { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .bag-stage { display: grid; justify-items: center; gap: 12px; }
+.recycle-play { width: min(360px, 100%); display: grid; gap: 10px; justify-items: center; }
+.bag-drop { position: relative; width: 100%; min-height: 300px; }
+.bag-drop.is-over .recycle-bag { filter: drop-shadow(0 0 18px rgba(29, 226, 141, 0.65)); }
+.toss-item {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(190, 255, 230, 0.25);
+  background: rgba(8, 28, 24, 0.88);
+  color: #e7fff5;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: grab;
+  animation: bob 5s ease-in-out infinite;
+}
+.toss-item:active { cursor: grabbing; }
+.toss-dot { width: 8px; height: 8px; border-radius: 50%; }
+.toss-hint, .toss-tip { text-align: center; max-width: 330px; margin: 0; }
+.toss-hint { color: var(--muted); font-size: 13px; }
+.toss-tip { padding: 10px 12px; }
+.toss-tip p { margin: 4px 0; color: #d5eee4; font-size: 13px; }
+.toss-tip em { color: var(--accent); font-style: normal; font-weight: 800; }
 .recycle-bag { width: 100%; max-width: 330px; height: auto; overflow: visible; }
 .hero-trio.is-compact .recycle-bag { max-width: 270px; }
 .bag-item { transform-box: fill-box; transform-origin: center; animation: bob 5s ease-in-out infinite; animation-delay: var(--d); }

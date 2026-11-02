@@ -3,18 +3,22 @@ import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Icon } from "../components/Icons";
-import { directionsUrl, findPoints, POINT_KINDS, searchPlace, type PointKind, type RecyclingPoint } from "../services/pointsService";
+import {
+  directionsUrl,
+  findPoints,
+  formatDrive,
+  formatWalk,
+  inPasto,
+  PASTO,
+  PASTO_BARRIOS,
+  PASTO_BOUNDS,
+  POINT_KINDS,
+  searchPlace,
+  type PointKind,
+  type RecyclingPoint,
+} from "../services/pointsService";
 
-type Status = "locating" | "loading" | "ready" | "need-place" | "error";
-
-const CITIES = [
-  { name: "Bogotá", lat: 4.6097, lon: -74.0817 },
-  { name: "Medellín", lat: 6.2442, lon: -75.5812 },
-  { name: "Cali", lat: 3.4516, lon: -76.5320 },
-  { name: "Barranquilla", lat: 10.9685, lon: -74.7813 },
-  { name: "Bucaramanga", lat: 7.1254, lon: -73.1198 },
-];
-
+type Status = "locating" | "loading" | "ready" | "error";
 
 export function PointsView() {
   const [params] = useSearchParams();
@@ -23,7 +27,7 @@ export function PointsView() {
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
   const markers = useRef(new Map<string, L.CircleMarker>());
-  const [origin, setOrigin] = useState<{ lat: number; lon: number; label: string } | null>(null);
+  const [origin, setOrigin] = useState<{ lat: number; lon: number; label: string }>(PASTO);
   const [points, setPoints] = useState<RecyclingPoint[]>([]);
   const [filter, setFilter] = useState<PointKind | "Todos">(initial);
   const [status, setStatus] = useState<Status>("locating");
@@ -32,7 +36,17 @@ export function PointsView() {
 
   useEffect(() => {
     if (!mapNode.current || map.current) return;
-    const instance = L.map(mapNode.current, { zoomControl: true, attributionControl: true }).setView([4.6, -74.1], 5);
+    const bounds = L.latLngBounds(
+      [PASTO_BOUNDS.south, PASTO_BOUNDS.west],
+      [PASTO_BOUNDS.north, PASTO_BOUNDS.east],
+    );
+    const instance = L.map(mapNode.current, {
+      zoomControl: true,
+      attributionControl: true,
+      maxBounds: bounds.pad(0.08),
+      maxBoundsViscosity: 1,
+      minZoom: 12,
+    }).setView([PASTO.lat, PASTO.lon], 14);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       className: "osm-dark",
@@ -48,21 +62,21 @@ export function PointsView() {
 
   useEffect(() => {
     if (!("geolocation" in navigator)) {
-      setStatus("need-place");
+      setOrigin(PASTO);
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (position) => setOrigin({ lat: position.coords.latitude, lon: position.coords.longitude, label: "Tu ubicación" }),
-      () => {
-        setStatus("need-place");
-        setMessage("No tengo permiso para ver tu ubicación. Escribe tu barrio o ciudad.");
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        setOrigin(inPasto(lat, lon) ? { lat, lon, label: "Tu ubicación" } : PASTO);
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+      () => setOrigin(PASTO),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
     );
   }, []);
 
   useEffect(() => {
-    if (!origin) return;
     let alive = true;
     setStatus("loading");
     setMessage("");
@@ -71,6 +85,7 @@ export function PointsView() {
         if (!alive) return;
         setPoints(found);
         setStatus("ready");
+        if (!found.length) setMessage("Aún no hay más puntos en el mapa abierto. Estos son los sitios de entrega en Pasto.");
       })
       .catch((err: Error) => {
         if (!alive) return;
@@ -83,14 +98,14 @@ export function PointsView() {
   }, [origin]);
 
   const visible = useMemo(
-    () => (filter === "Todos" ? points : points.filter((point) => point.kinds.includes(filter))),
+    () => (filter === "Todos" ? points : points.filter((point) => point.kinds.includes(filter) || (filter === "Electrónicos" && point.kinds.includes("Pilas")))),
     [points, filter],
   );
 
   useEffect(() => {
     const instance = map.current;
     const group = layer.current;
-    if (!instance || !group || !origin) return;
+    if (!instance || !group) return;
     group.clearLayers();
     markers.current.clear();
     L.circleMarker([origin.lat, origin.lon], { radius: 9, color: "#ffffff", weight: 3, fillColor: "#19c5c5", fillOpacity: 1 })
@@ -105,12 +120,12 @@ export function PointsView() {
         fillColor: point.isCentre ? "#ffd166" : "#1de28d",
         fillOpacity: 0.95,
       })
-        .bindPopup(popupHtml(point))
+        .bindPopup(popupHtml(point, origin))
         .addTo(group);
       markers.current.set(point.id, marker);
-      if (point.distanceKm <= 2.5) bounds.extend([point.lat, point.lon]);
+      bounds.extend([point.lat, point.lon]);
     }
-    instance.fitBounds(bounds.pad(0.25), { maxZoom: 15 });
+    instance.fitBounds(bounds.pad(0.18), { maxZoom: 15, animate: true });
   }, [visible, origin]);
 
   async function search(event: FormEvent) {
@@ -121,14 +136,14 @@ export function PointsView() {
     try {
       const place = await searchPlace(query);
       if (!place) {
-        setStatus("need-place");
-        setMessage("No encontré ese lugar. Prueba con «barrio, ciudad».");
+        setStatus("ready");
+        setMessage("Ese lugar no está en Pasto. Prueba un barrio: Centro, Torobajo, La Aurora…");
         return;
       }
       setOrigin(place);
     } catch (err) {
       setStatus("error");
-      setMessage(err instanceof Error ? err.message : "No pude buscar ese lugar");
+      setMessage(err instanceof Error ? err.message : "No pude buscar ese barrio");
     }
   }
 
@@ -138,24 +153,29 @@ export function PointsView() {
     marker?.openPopup();
   }
 
+  const nearest = visible[0];
+
   return (
     <div className="points-page">
       <header className="page-hero">
-        <h1>Puntos de <em>reciclaje</em></h1>
-        <p>Dónde llevar pilas, electrónicos, aceite y más, cerca de ti.</p>
+        <h1>Puntos de <em>reciclaje en Pasto</em></h1>
+        <p>Dónde llevar lo que EcoScan te dice que separes: plástico, papel, vidrio, pilas y RAEE, cerca de ti.</p>
       </header>
       <form className="points-search glass-card" onSubmit={(event) => void search(event)}>
         <Icon name="pin" size={18} />
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={origin ? `Cerca de: ${origin.label}` : "Escribe tu barrio o ciudad"} />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Barrio en Pasto (Centro, Torobajo…)" />
         <button className="cta cta-glow cta-sm">Buscar</button>
       </form>
-      <div className="city-chips" role="group" aria-label="Ciudades sugeridas">
-        <span className="city-chips-label">Explorar ciudad:</span>
-        {CITIES.map((c) => (
-          <button key={c.name} type="button" className={origin?.label === c.name ? "is-on" : ""} onClick={() => setOrigin({ lat: c.lat, lon: c.lon, label: c.name })}>
-            {c.name}
+      <div className="city-chips" role="group" aria-label="Barrios de Pasto">
+        <span className="city-chips-label">Barrio:</span>
+        {PASTO_BARRIOS.map((place) => (
+          <button key={place.label} type="button" className={origin.label === place.label ? "is-on" : ""} onClick={() => setOrigin(place)}>
+            {place.label}
           </button>
         ))}
+        <button type="button" className={origin.label === "Tu ubicación" ? "is-on" : ""} onClick={() => locateMe(setOrigin)}>
+          Mi ubicación
+        </button>
       </div>
       <div className="kind-chips" role="group" aria-label="Filtrar por tipo">
         {(["Todos", ...POINT_KINDS] as const).map((kind) => (
@@ -167,37 +187,56 @@ export function PointsView() {
           <div ref={mapNode} className="leaflet-host" />
         </div>
         <aside className="glass-card points-list">
-          <h2>{status === "ready" ? `${visible.length} ${visible.length === 1 ? "punto" : "puntos"} a menos de 5 km` : "Puntos cercanos"}</h2>
-          {status === "locating" ? <p className="loading">Buscando tu ubicación…</p> : null}
-          {status === "loading" ? <p className="loading">Consultando OpenStreetMap…</p> : null}
+          <h2>{status === "ready" ? `${visible.length} ${visible.length === 1 ? "punto" : "puntos"} en Pasto` : "Puntos cercanos"}</h2>
+          {status === "locating" || status === "loading" ? <p className="loading">Buscando dónde entregar en Pasto…</p> : null}
+          {nearest && status === "ready" ? (
+            <p className="hint">Lo más cerca: <strong>{nearest.name}</strong> · {formatWalk(nearest)} · {formatDrive(nearest)}</p>
+          ) : null}
           {message ? <p className={status === "error" ? "sheet-error" : "hint"}>{message}</p> : null}
           {status === "ready" && visible.length === 0 ? (
-            <p className="empty">No hay puntos registrados para «{filter}» en esta zona. Prueba otro filtro u otro barrio.</p>
+            <p className="empty">No hay puntos para «{filter}» en Pasto. Prueba Todos o Electrónicos.</p>
           ) : null}
           <ul>
             {visible.slice(0, 40).map((point) => (
               <li key={point.id}>
                 <button className="point-row" onClick={() => focus(point)}>
                   <strong>{point.name}</strong>
-                  <small>{point.distanceKm < 1 ? `${Math.round(point.distanceKm * 1000)} m` : `${point.distanceKm.toFixed(1)} km`}{point.hours ? ` · ${point.hours}` : ""}</small>
-                  {point.kinds.length ? <span className="point-kinds">{point.kinds.join(" · ")}</span> : <span className="point-kinds dim">Tipo no especificado</span>}
+                  <small>
+                    {point.distanceKm < 1 ? `${Math.round(point.distanceKm * 1000)} m` : `${point.distanceKm.toFixed(1)} km`}
+                    {` · ${formatWalk(point)} · ${formatDrive(point)}`}
+                    {point.address ? ` · ${point.address}` : ""}
+                  </small>
+                  {point.kinds.length ? <span className="point-kinds">{point.kinds.join(" · ")}</span> : <span className="point-kinds dim">Aprovechables</span>}
                 </button>
-                <a href={directionsUrl(point)} target="_blank" rel="noreferrer" className="point-go">Cómo llegar</a>
+                <a href={directionsUrl(point, origin)} target="_blank" rel="noreferrer" className="point-go">Cómo llegar</a>
               </li>
             ))}
           </ul>
-          <p className="points-note">
-            Datos de la comunidad de OpenStreetMap. ¿Falta un punto?{" "}
-            <a href="https://www.openstreetmap.org/" target="_blank" rel="noreferrer">Agrégalo</a>.
-          </p>
+          <p className="points-note">Solo Pasto. Combina sitios de entrega conocidos y OpenStreetMap.</p>
         </aside>
       </section>
     </div>
   );
 }
 
-function popupHtml(point: RecyclingPoint): string {
+function locateMe(setOrigin: (place: { lat: number; lon: number; label: string }) => void) {
+  if (!("geolocation" in navigator)) {
+    setOrigin(PASTO);
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      setOrigin(inPasto(lat, lon) ? { lat, lon, label: "Tu ubicación" } : PASTO);
+    },
+    () => setOrigin(PASTO),
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 60_000 },
+  );
+}
+
+function popupHtml(point: RecyclingPoint, origin: { lat: number; lon: number; label: string }): string {
   const safe = (value: string) => value.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char] ?? char);
-  const kinds = point.kinds.length ? point.kinds.join(" · ") : "Tipo no especificado";
-  return `<strong>${safe(point.name)}</strong><br/><span>${safe(kinds)}</span>${point.hours ? `<br/><small>${safe(point.hours)}</small>` : ""}<br/><a href="${directionsUrl(point)}" target="_blank" rel="noreferrer">Cómo llegar</a>`;
+  const kinds = point.kinds.length ? point.kinds.join(" · ") : "Aprovechables";
+  return `<strong>${safe(point.name)}</strong><br/><span>${safe(kinds)}</span><br/><small>${safe(formatWalk(point))} · ${safe(formatDrive(point))}</small>${point.address ? `<br/><small>${safe(point.address)}</small>` : ""}<br/><a href="${directionsUrl(point, origin)}" target="_blank" rel="noreferrer">Cómo llegar</a>`;
 }
