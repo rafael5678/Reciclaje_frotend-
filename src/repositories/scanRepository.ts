@@ -70,6 +70,8 @@ type AnalyzeRaw = {
   model?: string | null;
   scores: { code: string; score: number }[];
   guide?: { meaning: string; destination: string; actions: string[]; tip: string };
+  points?: number;
+  points_why?: string[];
 };
 
 export const scanRepository = {
@@ -87,6 +89,8 @@ export const scanRepository = {
       engine: raw.engine,
       model: raw.model ?? undefined,
       guide: raw.guide,
+      points: raw.points,
+      pointsWhy: raw.points_why,
     };
   },
   async list(): Promise<Scan[]> {

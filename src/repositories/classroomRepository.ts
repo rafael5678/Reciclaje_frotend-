@@ -2,12 +2,12 @@ import { api } from "./http";
 import { sessionRepository } from "./sessionRepository";
 
 export type Classroom = { id: number; name: string; code: string; members: number; isOwner: boolean };
-export type RankingRow = { position: number; name: string; scans: number; points: number; weekPoints: number; co2Kg: number; isMe: boolean };
+export type RankingRow = { position: number; name: string; scans: number; points: number; weekPoints: number; co2Kg: number; isMe: boolean; treeKind: string; treeStage: number };
 
 type ApiClassroom = { id: number; name: string; code: string; members: number; is_owner: boolean };
 type ApiRanking = {
   classroom: ApiClassroom;
-  rows: { position: number; name: string; scans: number; points: number; week_points: number; co2_kg: number; is_me: boolean }[];
+  rows: { position: number; name: string; scans: number; points: number; week_points: number; co2_kg: number; is_me: boolean; tree_kind?: string; tree_stage?: number }[];
 };
 
 function mapClassroom(raw: ApiClassroom): Classroom {
@@ -36,10 +36,18 @@ export const classroomRepository = {
         weekPoints: row.week_points,
         co2Kg: row.co2_kg,
         isMe: row.is_me,
+        treeKind: row.tree_kind ?? "ceiba",
+        treeStage: row.tree_stage ?? 0,
       })),
     };
   },
   leave(id: number): Promise<void> {
     return api<void>(`/api/classrooms/${id}/membership`, { method: "DELETE" }, sessionRepository.token());
+  },
+  invite(id: number): Promise<{ code: string; expiresIn: number }> {
+    return api<{ code: string; expires_in: number }>(`/api/classrooms/${id}/invite`, {}, sessionRepository.token()).then((raw) => ({
+      code: raw.code,
+      expiresIn: raw.expires_in,
+    }));
   },
 };

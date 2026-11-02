@@ -141,16 +141,20 @@ export function inPasto(lat: number, lon: number) {
   return lat >= PASTO_BOUNDS.south && lat <= PASTO_BOUNDS.north && lon >= PASTO_BOUNDS.west && lon <= PASTO_BOUNDS.east;
 }
 
+export function localPastoPoints(lat: number, lon: number): RecyclingPoint[] {
+  const origin = inPasto(lat, lon) ? { lat, lon } : PASTO;
+  return PASTO_DROPOFFS.map((item) => withTravel(item, origin.lat, origin.lon)).sort((a, b) => a.distanceKm - b.distanceKm);
+}
+
 export async function findPoints(lat: number, lon: number): Promise<RecyclingPoint[]> {
   const origin: Place = inPasto(lat, lon) ? { lat, lon, label: "Tu ubicación" } : PASTO;
-  const fromOsm = await findOsm(origin.lat, origin.lon);
   const merged = new Map<string, RecyclingPoint>();
-  for (const point of [...PASTO_DROPOFFS.map((item) => withTravel(item, origin.lat, origin.lon)), ...fromOsm]) {
+  for (const point of localPastoPoints(origin.lat, origin.lon)) merged.set(point.id, point);
+  for (const point of await findOsm(origin.lat, origin.lon)) {
     if (!inPasto(point.lat, point.lon)) continue;
     merged.set(point.id, withTravel(point, origin.lat, origin.lon));
   }
-  const list = [...merged.values()].sort((a, b) => a.distanceKm - b.distanceKm);
-  return enrichRoutes(origin, list);
+  return [...merged.values()].sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
 export async function searchPlace(text: string): Promise<Place | null> {
@@ -255,42 +259,6 @@ function withTravel(point: Omit<RecyclingPoint, "distanceKm" | "walkMin" | "driv
     driveMin: Math.max(1, Math.round((distanceKm / 22) * 60)),
   };
 }
-
-async function enrichRoutes(origin: Place, points: RecyclingPoint[]): Promise<RecyclingPoint[]> {
-  const nearest = points.slice(0, 8);
-  await Promise.all(
-    nearest.map(async (point, index) => {
-      const routed = await routeMinutes(origin, point);
-      if (!routed) return;
-      nearest[index] = { ...point, walkMin: routed.walkMin, driveMin: routed.driveMin };
-    }),
-  );
-  const byId = new Map(nearest.map((point) => [point.id, point]));
-  return points.map((point) => byId.get(point.id) ?? point);
-}
-
-async function routeMinutes(from: Place, to: RecyclingPoint): Promise<{ walkMin: number; driveMin: number } | null> {
-  const coord = `${from.lon},${from.lat};${to.lon},${to.lat}`;
-  try {
-    const [walk, drive] = await Promise.all([
-      fetch(`https://router.project-osrm.org/route/v1/foot/${coord}?overview=false`),
-      fetch(`https://router.project-osrm.org/route/v1/driving/${coord}?overview=false`),
-    ]);
-    const walkJson = walk.ok ? ((await walk.json()) as OsrmRoute) : null;
-    const driveJson = drive.ok ? ((await drive.json()) as OsrmRoute) : null;
-    const walkSec = walkJson?.routes?.[0]?.duration;
-    const driveSec = driveJson?.routes?.[0]?.duration;
-    if (walkSec == null && driveSec == null) return null;
-    return {
-      walkMin: Math.max(1, Math.round((walkSec ?? to.walkMin * 60) / 60)),
-      driveMin: Math.max(1, Math.round((driveSec ?? to.driveMin * 60) / 60)),
-    };
-  } catch {
-    return null;
-  }
-}
-
-type OsrmRoute = { routes?: { duration: number }[] };
 
 function distance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const rad = Math.PI / 180;

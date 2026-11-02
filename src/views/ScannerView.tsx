@@ -362,8 +362,9 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
               </div>
             ) : null}
             {saveError ? <p className="sheet-error">{saveError}</p> : null}
+            {hit.pointsWhy?.length ? <p className="hint">{hit.pointsWhy.join(" · ")}</p> : null}
             <button className="cta" onClick={() => void register()} disabled={busy}>
-              {busy ? "Guardando..." : "Registrar en mi Historial (+10 pts)"}
+              {busy ? "Guardando..." : `Registrar en mi Historial (+${hit.points ?? 10} pts)`}
               {!busy ? <Icon name="check" size={18} /> : null}
             </button>
             <button

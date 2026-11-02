@@ -6,6 +6,7 @@ import { Icon } from "../components/Icons";
 import {
   directionsUrl,
   findPoints,
+  localPastoPoints,
   formatDrive,
   formatWalk,
   inPasto,
@@ -78,20 +79,14 @@ export function PointsView() {
 
   useEffect(() => {
     let alive = true;
-    setStatus("loading");
+    setPoints(localPastoPoints(origin.lat, origin.lon));
+    setStatus("ready");
     setMessage("");
     findPoints(origin.lat, origin.lon)
       .then((found) => {
-        if (!alive) return;
-        setPoints(found);
-        setStatus("ready");
-        if (!found.length) setMessage("Aún no hay más puntos en el mapa abierto. Estos son los sitios de entrega en Pasto.");
+        if (alive) setPoints(found);
       })
-      .catch((err: Error) => {
-        if (!alive) return;
-        setStatus("error");
-        setMessage(err.message);
-      });
+      .catch(() => undefined);
     return () => {
       alive = false;
     };
@@ -188,7 +183,7 @@ export function PointsView() {
         </div>
         <aside className="glass-card points-list">
           <h2>{status === "ready" ? `${visible.length} ${visible.length === 1 ? "punto" : "puntos"} en Pasto` : "Puntos cercanos"}</h2>
-          {status === "locating" || status === "loading" ? <p className="loading">Buscando dónde entregar en Pasto…</p> : null}
+          {status === "locating" ? <p className="loading">Ubicándote en Pasto…</p> : null}
           {nearest && status === "ready" ? (
             <p className="hint">Lo más cerca: <strong>{nearest.name}</strong> · {formatWalk(nearest)} · {formatDrive(nearest)}</p>
           ) : null}

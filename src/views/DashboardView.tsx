@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { CountUp } from "../components/CountUp";
 import { Icon } from "../components/Icons";
 import { LoadState } from "../components/LoadState";
+import { GrowTree } from "../components/GrowTree";
 import { RecyclePlay } from "../components/RecyclePlay";
 import { ScanPhoto } from "../components/ScanPhoto";
 import { StatTile } from "../components/StatTile";
@@ -80,12 +81,13 @@ export function DashboardView() {
           )}
         </section>
         <section className="glass-card level-card">
-          <span className="level-emoji" aria-hidden="true">{level.emoji}</span>
+          <GrowTree points={impact.points} category={impact.categories[0]?.name} />
           <div>
-            <small>Tu nivel</small>
+            <small>Tu bosque</small>
             <h2>{level.name}</h2>
             <div className="level-bar"><i style={{ width: `${Math.round(level.progress * 100)}%` }} /></div>
             <p>{level.next ? `${impact.points} pts · faltan ${level.next.missing} para ${level.next.name}` : `${impact.points} pts · nivel máximo`}</p>
+            <p className="hint">El árbol cambia según lo que más escaneas: palmera (plástico), pino (papel), frutal (orgánico)…</p>
           </div>
         </section>
         <section className="glass-card quote">

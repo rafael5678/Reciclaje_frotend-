@@ -122,4 +122,6 @@ export type VisionHit = {
   engine?: string;
   model?: string;
   guide?: ObjectGuide;
+  points?: number;
+  pointsWhy?: string[];
 };

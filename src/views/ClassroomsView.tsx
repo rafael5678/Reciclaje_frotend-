@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { GrowTree } from "../components/GrowTree";
 import { Icon } from "../components/Icons";
 import { classroomRepository, type Classroom, type RankingRow } from "../repositories/classroomRepository";
+import type { TreeKind } from "../services/forest";
 import { formatKg } from "../services/format";
 import { useSession } from "./SessionProvider";
 
@@ -18,6 +20,7 @@ export function ClassroomsView() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [invite, setInvite] = useState({ code: "", expiresIn: 30 });
 
   const loadRooms = useCallback(async (focus?: number) => {
     try {
@@ -49,8 +52,23 @@ export function ClassroomsView() {
       .catch((err: Error) => {
         if (alive) setError(err.message);
       });
+    const loadInvite = () =>
+      classroomRepository.invite(selected).then((next) => {
+        if (alive) setInvite(next);
+      }).catch(() => undefined);
+    void loadInvite();
+    const timer = window.setInterval(() => {
+      setInvite((current) => {
+        if (current.expiresIn <= 1) {
+          void loadInvite();
+          return current;
+        }
+        return { ...current, expiresIn: current.expiresIn - 1 };
+      });
+    }, 1000);
     return () => {
       alive = false;
+      window.clearInterval(timer);
     };
   }, [selected, revision]);
 
@@ -151,7 +169,7 @@ export function ClassroomsView() {
           </form>
           <form className="glass-card room-form" onSubmit={join}>
             <h2>Unirme con código</h2>
-            <input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder="Ej: X6WVCC" minLength={4} maxLength={12} required />
+            <input value={code} onChange={(event) => setCode(event.target.value.toUpperCase())} placeholder="Código vivo (cambia cada 30 s)" minLength={4} maxLength={12} required />
             <button className="ghost-btn" disabled={busy}>Unirme</button>
           </form>
         </aside>
@@ -164,13 +182,22 @@ export function ClassroomsView() {
               <header className="ranking-head">
                 <div>
                   <h2>{ranking.classroom.name}</h2>
-                  <p>{ranking.rows.length} {ranking.rows.length === 1 ? "miembro" : "miembros"} · comparte el código para que se unan</p>
+                  <p>{ranking.rows.length} {ranking.rows.length === 1 ? "miembro" : "miembros"} · el código cambia cada 30 s</p>
                 </div>
-                <button className="code-chip" onClick={() => void copy(ranking.classroom.code)} aria-label="Copiar código del salón">
+                <button className="code-chip" onClick={() => void copy(invite.code || ranking.classroom.code)} aria-label="Copiar código del salón">
                   <Icon name="copy" size={15} />
-                  {copied ? "¡Copiado!" : ranking.classroom.code}
+                  {copied ? "¡Copiado!" : invite.code || ranking.classroom.code}
+                  <small className="code-ttl">{invite.expiresIn}s</small>
                 </button>
               </header>
+              <div className="grove">
+                {ranking.rows.map((row) => (
+                  <div key={`tree-${row.position}-${row.name}`} className={row.isMe ? "is-me" : ""}>
+                    <GrowTree compact kind={row.treeKind as TreeKind} stage={row.treeStage} points={row.points} />
+                    <span>{row.name}</span>
+                  </div>
+                ))}
+              </div>
               <div className="podium">
                 {podium.map((row, index) => (
                   <div key={`${row.position}-${row.name}`} className={`podium-step step-${index + 1}${row.isMe ? " is-me" : ""}`}>
@@ -183,13 +210,14 @@ export function ClassroomsView() {
               <div className="table-wrap">
                 <table>
                   <thead>
-                    <tr><th>#</th><th>Nombre</th><th>Escaneos</th><th>Puntos</th><th>Esta semana</th><th>CO₂ evitado</th></tr>
+                    <tr><th>#</th><th>Nombre</th><th>Árbol</th><th>Escaneos</th><th>Puntos</th><th>Esta semana</th><th>CO₂ evitado</th></tr>
                   </thead>
                   <tbody>
                     {ranking.rows.map((row) => (
                       <tr key={`${row.position}-${row.name}`} className={row.isMe ? "is-me" : ""}>
                         <td>{row.position}</td>
                         <td>{row.name}{row.isMe ? <span className="me-badge">Tú</span> : null}</td>
+                        <td>{row.treeKind}</td>
                         <td>{row.scans}</td>
                         <td><strong>{row.points}</strong></td>
                         <td>+{row.weekPoints}</td>

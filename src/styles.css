@@ -851,6 +851,15 @@ td:first-child { display: flex; align-items: center; gap: 8px; }
 .glass-card.tips ul { margin-top: 4px; }
 .glass-card.tips svg { padding: 4px; }
 .home-bottom { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(220px, 0.8fr) minmax(220px, 1fr); gap: 16px; margin-top: 20px; }
+.grow-tree { display: grid; justify-items: center; gap: 4px; min-width: 88px; }
+.grow-tree p { display: grid; gap: 2px; text-align: center; margin: 0; }
+.grow-tree p span, .grow-tree small { color: var(--muted); font-size: 11px; }
+.tree-svg { width: 80px; height: 90px; }
+.grow-tree.is-compact .tree-svg { width: 56px; height: 64px; }
+.grove { display: flex; gap: 10px; overflow: auto; padding: 4px 0 12px; }
+.grove > div { display: grid; justify-items: center; gap: 4px; min-width: 72px; }
+.grove span { font-size: 12px; font-weight: 700; }
+.code-ttl { letter-spacing: 0; font-weight: 700; color: var(--accent); }
 .level-card { display: flex; gap: 14px; align-items: center; }
 .level-emoji { font-size: 40px; animation: float 5s ease-in-out infinite; }
 .level-card small { color: var(--muted); font-size: 12px; }
