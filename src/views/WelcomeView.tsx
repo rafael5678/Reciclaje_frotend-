@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ImpactPanel } from "../components/ImpactPanel";
 import { Brand } from "../components/Logo";
-import { ServerBar } from "../components/ServerBar";
 import { PlanetScene } from "../components/PlanetScene";
 import type { Impact } from "../models/types";
 import { authService } from "../services/authService";
@@ -55,8 +54,8 @@ export function WelcomeView() {
     try {
       setSession((await authService.guest()).session);
       navigate(path);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "No pude entrar");
+    } catch {
+      setError("No se pudo entrar. Espera unos segundos e inténtalo de nuevo.");
     } finally {
       setBusy(false);
     }
@@ -74,7 +73,6 @@ export function WelcomeView() {
         <h1>Tu aliado en el <span className="grad">reciclaje inteligente</span></h1>
         <p>Sube una foto del residuo y te decimos en qué contenedor va, con los pasos para dejarlo bien.</p>
         {error ? <p className="sheet-error">{error}</p> : null}
-        {error ? <ServerBar /> : null}
         <button className="cta cta-glow cta-xl" onClick={() => void go(wide ? "/panel" : "/app/escaner")} disabled={busy}>
           {busy ? "Entrando…" : session ? `Seguir como ${session.user.name.split(" ")[0]} →` : "Comenzar →"}
         </button>

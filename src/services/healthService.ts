@@ -26,7 +26,7 @@ export const healthService = {
     try {
       const raw = await api<ApiHealth>("/api/health");
       if (raw.service && raw.service !== "ecoscan") {
-        return { ...CHECKING, state: "offline", error: "Esa URL no es el backend de EcoScan. Cambia VITE_API_URL o pégala en Configuración." };
+        return { ...CHECKING, state: "offline", error: "Sin conexión con el servidor" };
       }
       return {
         state: "online",

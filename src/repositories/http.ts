@@ -8,21 +8,15 @@ export class ApiError extends Error {
 }
 
 const OFFLINE = "Sin conexión con el servidor";
-const MISCONFIGURED = "La URL de la API no apunta a EcoScan. Pégala en Configuración o en VITE_API_URL de Vercel.";
-const STORAGE_KEY = "ecoscan.apiUrl";
 const GET_RETRIES = [2500, 8000];
 const REQUEST_MS = 90_000;
+const PRODUCTION_API = "https://reciclaje-backend-cxav.onrender.com";
 
 export function getApiBase() {
-  const override = (typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY) : "") || "";
-  const env = String(import.meta.env.VITE_API_URL || "");
-  return (override || env).trim().replace(/\/$/, "");
-}
-
-export function setApiBase(url: string) {
-  const next = url.trim().replace(/\/$/, "");
-  if (next) localStorage.setItem(STORAGE_KEY, next);
-  else localStorage.removeItem(STORAGE_KEY);
+  const env = String(import.meta.env.VITE_API_URL || "").trim().replace(/\/$/, "");
+  if (env) return env;
+  if (import.meta.env.PROD) return PRODUCTION_API;
+  return "";
 }
 
 export function apiUrl(path: string) {
@@ -70,9 +64,7 @@ async function send(run: () => Promise<Response>, retries: number[]): Promise<Re
       return await withTimeout(run());
     } catch (error) {
       if (error instanceof ApiError) throw error;
-      if (attempt >= retries.length) {
-        throw new ApiError(0, getApiBase() ? OFFLINE : MISCONFIGURED);
-      }
+      if (attempt >= retries.length) throw new ApiError(0, OFFLINE);
       await wait(retries[attempt]);
     }
   }
@@ -80,38 +72,29 @@ async function send(run: () => Promise<Response>, retries: number[]): Promise<Re
 
 function withTimeout(promise: Promise<Response>): Promise<Response> {
   return new Promise((resolve, reject) => {
-    const timer = window.setTimeout(() => reject(new ApiError(0, "El servidor tardó demasiado. Si está en Render, espera a que despierte e inténtalo otra vez.")), REQUEST_MS);
+    const timer = window.setTimeout(() => reject(new ApiError(0, OFFLINE)), REQUEST_MS);
     promise.then(resolve, reject).finally(() => window.clearTimeout(timer));
   });
 }
 
 async function readJson<T>(response: Response): Promise<T> {
   const type = response.headers.get("content-type") ?? "";
-  if (!type.includes("application/json")) throw new ApiError(0, MISCONFIGURED);
+  if (!type.includes("application/json")) throw new ApiError(0, OFFLINE);
   return response.json() as Promise<T>;
 }
 
 async function readError(response: Response, fallback: string): Promise<string> {
-  if (response.status === 404) {
-    const url = response.url || "";
-    if (url.includes("/auth/guest")) {
-      return "El modo invitado aún no está en el servidor público. Entra con tu cuenta (Iniciar sesión) o vuelve a desplegar Reciclaje_backend- en Render.";
-    }
-    if (url.includes("/classrooms")) {
-      return "Los salones aún no están en el servidor público. En Render, abre tu API de EcoScan y pulsa Manual Deploy del último commit.";
-    }
-  }
   try {
     return readDetail(await response.json(), fallback);
   } catch {
-    return response.status === 404 ? "El servidor no tiene esa función. Revisa la URL de Render o vuelve a desplegar el backend." : fallback;
+    return fallback;
   }
 }
 
 function readDetail(body: unknown, fallback: string): string {
   if (!body || typeof body !== "object" || !("detail" in body)) return fallback;
   const detail = (body as { detail?: unknown }).detail;
-  if (typeof detail === "string") return detail;
+  if (typeof detail === "string" && detail !== "Not Found") return detail;
   if (Array.isArray(detail)) {
     return detail
       .map((item) => {
