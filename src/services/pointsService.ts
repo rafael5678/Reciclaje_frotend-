@@ -180,6 +180,7 @@ export function directionsUrl(point: RecyclingPoint, from?: Place): string {
   return `https://www.google.com/maps/dir/?api=1${origin}&destination=${point.lat},${point.lon}&travelmode=walking`;
 }
 
+/** Map a material code to a map filter. */
 export function kindForMaterial(code: string): PointKind {
   if (code === "PAP") return "Papel y cartón";
   if (code === "VID") return "Vidrio";
