@@ -1,4 +1,4 @@
-/** Explica Gemini, MIRA y TrashNet. */
+/** Explains Gemini, MIRA, and TrashNet. */
 import { RecycleBag } from "../components/RecycleBag";
 import { StatTile } from "../components/StatTile";
 import { modelLabel } from "../services/format";
