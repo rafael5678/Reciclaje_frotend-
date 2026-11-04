@@ -13,6 +13,7 @@ export function formatKg(value: number): string {
   return `${value.toFixed(1)} kg`;
 }
 
+/** Format points with Colombian grouping. */
 export function formatPoints(value: number): string {
   return value.toLocaleString("es-CO");
 }
