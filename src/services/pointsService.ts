@@ -1,3 +1,4 @@
+/** Puntos de acopio en Pasto y consultas OSM. */
 export type PointKind = "Pilas" | "Electrónicos" | "Aceite" | "Plástico" | "Papel y cartón" | "Vidrio" | "Metal" | "Orgánico" | "Ropa";
 
 export type RecyclingPoint = {
