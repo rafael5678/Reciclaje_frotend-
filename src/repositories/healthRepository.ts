@@ -1,3 +1,4 @@
+/** GET /api/health. */
 import { api } from "./http";
 
 export type ApiHealth = {
