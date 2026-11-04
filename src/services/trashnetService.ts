@@ -1,3 +1,4 @@
+/** On-device TrashNet classifier. */
 import type { Frame } from "./visionService";
 
 export type TrashClass = "cardboard" | "glass" | "metal" | "paper" | "plastic" | "trash";
