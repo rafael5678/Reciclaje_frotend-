@@ -1,4 +1,4 @@
-/** Miniatura del escaneo o ilustracion si no hay foto. */
+/** Scan thumbnail, or artwork when there is no photo. */
 import { useEffect, useState } from "react";
 import type { Scan } from "../models/types";
 import { scanRepository } from "../repositories/scanRepository";
