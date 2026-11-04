@@ -1,4 +1,4 @@
-/** Planeta SVG reutilizable. */
+/** Reusable SVG planet. */
 import { forwardRef, useId } from "react";
 
 export const LAND_STRIP = 480;
