@@ -143,6 +143,7 @@ export function inPasto(lat: number, lon: number) {
   return lat >= PASTO_BOUNDS.south && lat <= PASTO_BOUNDS.north && lon >= PASTO_BOUNDS.west && lon <= PASTO_BOUNDS.east;
 }
 
+/** Curated Pasto drop-offs, shown immediately. */
 export function localPastoPoints(lat: number, lon: number): RecyclingPoint[] {
   const origin = inPasto(lat, lon) ? { lat, lon } : PASTO;
   return PASTO_DROPOFFS.map((item) => withTravel(item, origin.lat, origin.lon)).sort((a, b) => a.distanceKm - b.distanceKm);
