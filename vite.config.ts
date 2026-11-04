@@ -25,6 +25,7 @@ function serveOrtRuntime(): Plugin {
 export default defineConfig({
   plugins: [serveOrtRuntime(), react()],
   optimizeDeps: {
+// Proxy /api to the local FastAPI process.
     exclude: ["onnxruntime-web"],
   },
   server: {
