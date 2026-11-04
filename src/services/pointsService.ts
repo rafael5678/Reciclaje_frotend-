@@ -199,6 +199,7 @@ export function formatWalk(point: RecyclingPoint) {
   return mins ? `${hours} h ${mins} min a pie` : `${hours} h a pie`;
 }
 
+/** Driving time label. */
 export function formatDrive(point: RecyclingPoint) {
   if (point.driveMin < 2) return "1–2 min en carro";
   return `${point.driveMin} min en carro`;
