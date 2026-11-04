@@ -1,3 +1,4 @@
+/** Materials HTTP endpoint with catalog fallback. */
 import { MATERIALS } from "../models/catalog";
 import type { Material } from "../models/types";
 import { api } from "./http";
