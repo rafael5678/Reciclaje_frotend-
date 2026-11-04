@@ -1,3 +1,4 @@
+/** Escaneo en el panel de escritorio. */
 import { RecycleBag } from "../components/RecycleBag";
 import type { Scan } from "../models/types";
 import { ScannerView } from "./ScannerView";
