@@ -1,4 +1,4 @@
-/** Portada: comenzar, sesion local o entrar con otra cuenta. */
+/** Landing: start, local session, or another account. */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ImpactPanel } from "../components/ImpactPanel";
