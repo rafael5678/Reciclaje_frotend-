@@ -8,7 +8,7 @@ import { exportExcel } from "../services/exportService";
 import { formatPercent, formatWhen } from "../services/format";
 import { impactService } from "../services/impactService";
 import { scanService } from "../services/scanService";
-import { useSession } from "./SessionProvider";
+import { useSession } from "../context/SessionProvider";
 
 const FILTERS = ["Todos", "Plástico", "Papel y cartón", "Vidrio", "Metal", "Orgánico", "General"];
 

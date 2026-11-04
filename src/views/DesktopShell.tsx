@@ -4,8 +4,8 @@ import { Icon, type IconName } from "../components/Icons";
 import { Brand } from "../components/Logo";
 import { firstName, initials } from "../services/format";
 import { modelLabel } from "../services/healthService";
-import { useSession } from "./SessionProvider";
-import { refreshServerHealth, useServerHealth } from "./useServerHealth";
+import { useSession } from "../context/SessionProvider";
+import { refreshServerHealth, useServerHealth } from "../hooks/useServerHealth";
 
 const LINKS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: "/panel", label: "Inicio", icon: "home", end: true },

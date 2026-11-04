@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { initials } from "../services/format";
 import { modelLabel } from "../services/healthService";
-import { useSession } from "./SessionProvider";
-import { useServerHealth } from "./useServerHealth";
+import { useSession } from "../context/SessionProvider";
+import { useServerHealth } from "../hooks/useServerHealth";
 
 export function SettingsView() {
   const { session, logout } = useSession();

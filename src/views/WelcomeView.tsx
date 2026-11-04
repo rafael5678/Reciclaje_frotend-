@@ -6,7 +6,7 @@ import { PlanetScene } from "../components/PlanetScene";
 import type { Impact } from "../models/types";
 import { authService } from "../services/authService";
 import { impactService } from "../services/impactService";
-import { useSession } from "./SessionProvider";
+import { useSession } from "../context/SessionProvider";
 
 export function WelcomeView() {
   const navigate = useNavigate();

@@ -8,7 +8,7 @@ import { ScanPhoto } from "../components/ScanPhoto";
 import { StatTile } from "../components/StatTile";
 import { formatAgo, signedPercent } from "../services/format";
 import { levelFor } from "../services/levels";
-import { useImpact } from "./useImpact";
+import { useImpact } from "../hooks/useImpact";
 
 export function DashboardView() {
   const { impact, error, retry } = useImpact();

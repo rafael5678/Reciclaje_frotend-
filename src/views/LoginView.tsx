@@ -5,7 +5,7 @@ import { Brand } from "../components/Logo";
 import { Planet } from "../components/Planet";
 import { authService, type AuthResult } from "../services/authService";
 import { prefersReducedMotion } from "../services/motion";
-import { useSession } from "./SessionProvider";
+import { useSession } from "../context/SessionProvider";
 
 const LEAVES = Array.from({ length: 9 }, (_, index) => index);
 

@@ -15,7 +15,7 @@ import { ScannerView } from "./views/ScannerView";
 import { ScansView } from "./views/ScansView";
 import { SettingsView } from "./views/SettingsView";
 import { StatsView } from "./views/StatsView";
-import { useSession } from "./views/SessionProvider";
+import { useSession } from "./context/SessionProvider";
 import { WelcomeView } from "./views/WelcomeView";
 
 const ClassroomsView = lazy(() => import("./views/ClassroomsView").then((module) => ({ default: module.ClassroomsView })));

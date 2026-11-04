@@ -11,7 +11,7 @@ import { scanService } from "../services/scanService";
 import { loadMira } from "../services/miraService";
 import { ScanBrain } from "../services/scanBrain";
 import { loadTrashnet } from "../services/trashnetService";
-import { useSession } from "./SessionProvider";
+import { useSession } from "../context/SessionProvider";
 
 export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" }) {
   const navigate = useNavigate();

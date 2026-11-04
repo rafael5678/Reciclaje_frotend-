@@ -6,7 +6,7 @@ import type { Impact, Scan } from "../models/types";
 import { formatKg, formatPercent } from "../services/format";
 import { impactService } from "../services/impactService";
 import { scanService } from "../services/scanService";
-import { useSession } from "./SessionProvider";
+import { useSession } from "../context/SessionProvider";
 
 export function ReportView() {
   const { session } = useSession();

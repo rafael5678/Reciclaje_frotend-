@@ -5,7 +5,7 @@ import { Icon } from "../components/Icons";
 import { classroomRepository, type Classroom, type RankingRow } from "../repositories/classroomRepository";
 import type { TreeKind } from "../services/forest";
 import { formatKg } from "../services/format";
-import { useSession } from "./SessionProvider";
+import { useSession } from "../context/SessionProvider";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 

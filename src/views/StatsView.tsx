@@ -1,7 +1,7 @@
 import { CategoryBars, Delta, StackBar, WeeklyChart } from "../components/Charts";
 import { LoadState } from "../components/LoadState";
 import { formatKg, formatPercent } from "../services/format";
-import { useImpact } from "./useImpact";
+import { useImpact } from "../hooks/useImpact";
 
 export function StatsView() {
   const { impact, error, retry } = useImpact();

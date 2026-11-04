@@ -2,7 +2,7 @@ import { BinPill, Delta, Legend, StackBar } from "../components/Charts";
 import { LoadState } from "../components/LoadState";
 import { WasteArt } from "../components/WasteArt";
 import { formatKg, formatWhen } from "../services/format";
-import { useImpact } from "./useImpact";
+import { useImpact } from "../hooks/useImpact";
 
 export function ImpactView() {
   const { impact, error, retry } = useImpact();

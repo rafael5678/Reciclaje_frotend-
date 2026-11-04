@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Impact } from "../models/types";
 import { impactService } from "../services/impactService";
-import { useSession } from "./SessionProvider";
+import { useSession } from "../context/SessionProvider";
 
 export function useImpact() {
   const { revision } = useSession();

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { formatKg, formatPoints, initials } from "../services/format";
-import { useSession } from "./SessionProvider";
-import { useImpact } from "./useImpact";
+import { useSession } from "../context/SessionProvider";
+import { useImpact } from "../hooks/useImpact";
 
 export function ProfileView() {
   const { session, logout } = useSession();
