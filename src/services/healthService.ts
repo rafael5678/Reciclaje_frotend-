@@ -1,16 +1,5 @@
 import type { ServerHealth } from "../models/types";
-import { api } from "../repositories/http";
-
-type ApiHealth = {
-  service?: string;
-  database: boolean;
-  gemini: boolean;
-  vision?: {
-    models: { name: string; available: boolean; retry_at: number | null }[];
-    per_minute: number;
-    used_last_minute: number;
-  };
-};
+import { healthRepository } from "../repositories/healthRepository";
 
 export const CHECKING: ServerHealth = {
   state: "checking",
@@ -24,7 +13,7 @@ export const CHECKING: ServerHealth = {
 export const healthService = {
   async get(): Promise<ServerHealth> {
     try {
-      const raw = await api<ApiHealth>("/api/health");
+      const raw = await healthRepository.get();
       if (raw.service && raw.service !== "ecoscan") {
         return { ...CHECKING, state: "offline", error: "Sin conexión con el servidor" };
       }
