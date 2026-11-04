@@ -1,4 +1,4 @@
-/** Animacion numerica usada por CountUp. */
+/** Numeric animation used by CountUp. */
 import { useEffect, useState } from "react";
 import { prefersReducedMotion } from "../services/motion";
 
