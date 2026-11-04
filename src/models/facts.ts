@@ -1,3 +1,4 @@
+/** Datos ecologicos que rotan en la bienvenida. */
 export const ECO_FACTS = [
   "Reciclar una lata de aluminio ahorra cerca del 95 % de la energía que cuesta fabricarla nueva.",
   "El vidrio se puede reciclar una y otra vez sin perder calidad.",
