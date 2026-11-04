@@ -1,4 +1,4 @@
-/** Estado de carga y reintento cuando falla el servidor. */
+/** Loading and retry state when the server fails. */
 export function LoadState({ error, onRetry, loading = "Cargando..." }: { error: string; onRetry: () => void; loading?: string }) {
   if (!error) return <p className="loading">{loading}</p>;
   return (
