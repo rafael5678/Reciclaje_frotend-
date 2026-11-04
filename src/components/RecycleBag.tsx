@@ -1,4 +1,4 @@
-/** Bolsa de reciclaje ilustrada. */
+/** Illustrated recycling bag. */
 import { useId } from "react";
 
 type Center = "recycle" | "camera" | "network";
