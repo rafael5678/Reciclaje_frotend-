@@ -3,8 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-// Serve ONNX Runtime WASM from /public/ort in dev.
 
+// Serve ONNX Runtime WASM from /public/ort in dev.
 function serveOrtRuntime(): Plugin {
   const root = path.resolve("public/ort");
   return {
@@ -25,12 +25,12 @@ function serveOrtRuntime(): Plugin {
 export default defineConfig({
   plugins: [serveOrtRuntime(), react()],
   optimizeDeps: {
-// Proxy /api to the local FastAPI process.
     exclude: ["onnxruntime-web"],
   },
   server: {
     host: true,
     port: 5173,
+    // Proxy /api to the local FastAPI process.
     proxy: {
       "/api": "http://127.0.0.1:8000",
     },
