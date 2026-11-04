@@ -1,3 +1,4 @@
+/** Estadisticas del panel de escritorio. */
 import { CategoryBars, Delta, StackBar, WeeklyChart } from "../components/Charts";
 import { LoadState } from "../components/LoadState";
 import { formatKg, formatPercent } from "../services/format";
