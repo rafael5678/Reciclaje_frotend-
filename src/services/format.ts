@@ -62,6 +62,7 @@ export function signedPercent(value: number): string {
   return `${value}%`;
 }
 
+/** Human label for a Gemini model id. */
 export function modelLabel(name: string): string {
   return name
     .split("-")
