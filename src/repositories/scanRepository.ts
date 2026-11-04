@@ -1,3 +1,4 @@
+/** Scan HTTP endpoints. */
 import { materialByCode } from "../models/catalog";
 import type { Scan, VisionHit } from "../models/types";
 import { api, apiUpload, apiUrl } from "./http";
