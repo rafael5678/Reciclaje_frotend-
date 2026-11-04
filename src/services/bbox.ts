@@ -1,4 +1,4 @@
-/** Utilidades de recuadro para fusionar detecciones. */
+/** Bounding-box helpers to fuse detections. */
 import type { BBox } from "../models/types";
 
 export function clamp(value: number, min: number, max: number) {
