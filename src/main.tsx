@@ -1,4 +1,4 @@
-/** Arranque de React con el proveedor de sesion y el enrutador. */
+/** React bootstrap with the session provider and router. */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
