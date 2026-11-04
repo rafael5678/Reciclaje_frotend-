@@ -20,6 +20,7 @@ export function buildXlsx(sheets: Sheet[]): Blob {
   return new Blob([zip(files)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 }
 
+/** Trigger a browser download. */
 export function download(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
