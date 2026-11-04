@@ -1,4 +1,4 @@
-/** Marco del panel: menu, salud del servidor y contenido. */
+/** Desktop chrome: menu, server health, and content. */
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { Icon, type IconName } from "../components/Icons";
