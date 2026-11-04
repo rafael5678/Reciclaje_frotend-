@@ -1,3 +1,4 @@
+/** Fusiona forma, MIRA y TrashNet en un solo resultado. */
 import { materialByCode } from "../models/catalog";
 import type { BBox, Score, VisionHit } from "../models/types";
 import { boxJump, clamp, mixBox } from "./bbox";
