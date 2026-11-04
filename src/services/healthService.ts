@@ -1,3 +1,4 @@
+/** Maps /api/health into UI state. */
 import type { ServerHealth } from "../models/types";
 import { healthRepository } from "../repositories/healthRepository";
 
