@@ -1,3 +1,4 @@
+/** Auth HTTP endpoints. */
 import type { User } from "../models/types";
 import { api } from "./http";
 
