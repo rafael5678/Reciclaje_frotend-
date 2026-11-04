@@ -1,3 +1,4 @@
+/** Cheap on-device shape and color detector. */
 import { materialByCode } from "../models/catalog";
 import type { VisionHit } from "../models/types";
 
