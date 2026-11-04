@@ -6,6 +6,7 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+/** Distance between two box centers. */
 export function boxJump(a: BBox, b: BBox) {
   return Math.hypot(a.x + a.w / 2 - (b.x + b.w / 2), a.y + a.h / 2 - (b.y + b.h / 2));
 }
