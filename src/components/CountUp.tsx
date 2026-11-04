@@ -1,4 +1,4 @@
-/** Numero animado para puntos e impacto. */
+/** Animated number for points and impact. */
 import { useCountUp } from "../hooks/useCountUp";
 
 export function CountUp({ value, decimals = 0, suffix = "", active = true }: { value: number; decimals?: number; suffix?: string; active?: boolean }) {
