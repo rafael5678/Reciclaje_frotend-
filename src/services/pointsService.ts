@@ -190,6 +190,7 @@ export function kindForMaterial(code: string): PointKind {
   return "Plástico";
 }
 
+/** Walking time label. */
 export function formatWalk(point: RecyclingPoint) {
   if (point.walkMin < 2) return "Menos de 2 min a pie";
   if (point.walkMin < 60) return `${point.walkMin} min a pie`;
