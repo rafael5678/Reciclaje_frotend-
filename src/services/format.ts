@@ -3,6 +3,7 @@ export function formatConfidence(value: number, digits = 1): string {
   return `${(value * 100).toFixed(digits)}%`;
 }
 
+/** Format a 0-100 value as a percent. */
 export function formatPercent(value: number): string {
   return `${Math.round(value)}%`;
 }
