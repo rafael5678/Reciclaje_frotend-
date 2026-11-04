@@ -1,3 +1,4 @@
+/** Bolsa de reciclaje ilustrada. */
 import { useId } from "react";
 
 type Center = "recycle" | "camera" | "network";
