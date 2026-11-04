@@ -1,3 +1,4 @@
+// Vite + React config for EcoScan.
 import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
