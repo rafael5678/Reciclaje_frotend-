@@ -1,3 +1,4 @@
+/** Catalogo local de materiales si el API no responde. */
 import type { Material } from "./types";
 
 export const MATERIALS: Material[] = [
