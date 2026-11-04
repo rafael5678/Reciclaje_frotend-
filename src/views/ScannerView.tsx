@@ -1,4 +1,4 @@
-/** Camara y foto: detecta el residuo y guarda el escaneo. */
+/** Camera and photo: detect waste and save the scan. */
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BinPill } from "../components/Charts";
