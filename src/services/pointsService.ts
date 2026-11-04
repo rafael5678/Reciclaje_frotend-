@@ -138,6 +138,7 @@ const PASTO_DROPOFFS: Omit<RecyclingPoint, "distanceKm" | "walkMin" | "driveMin"
   },
 ];
 
+/** Whether coordinates fall inside Pasto. */
 export function inPasto(lat: number, lon: number) {
   return lat >= PASTO_BOUNDS.south && lat <= PASTO_BOUNDS.north && lon >= PASTO_BOUNDS.west && lon <= PASTO_BOUNDS.east;
 }
