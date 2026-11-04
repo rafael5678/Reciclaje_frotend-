@@ -1,27 +1,10 @@
 import type { Impact } from "../models/types";
-import { api } from "../repositories/http";
+import { impactRepository } from "../repositories/impactRepository";
 import { mapScan } from "../repositories/scanRepository";
-import { sessionRepository } from "../repositories/sessionRepository";
-
-type ApiImpact = {
-  total: number;
-  well_percent: number;
-  today: number;
-  last7: number;
-  previous7: number;
-  night: number;
-  week_change_percent: number;
-  points: number;
-  weight_kg: number;
-  co2_kg: number;
-  weekly: { label: string; count: number; is_today: boolean }[];
-  categories: { name: string; count: number; percent: number; color: string }[];
-  recent: Parameters<typeof mapScan>[0][];
-};
 
 export const impactService = {
   async get(): Promise<Impact> {
-    const raw = await api<ApiImpact>("/api/impact", {}, sessionRepository.token());
+    const raw = await impactRepository.get();
     return {
       total: raw.total,
       wellPercent: raw.well_percent,
