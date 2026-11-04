@@ -56,6 +56,7 @@ export function formatAgo(iso: string): string {
   return `Hace ${days} días`;
 }
 
+/** Percent with a leading plus when positive. */
 export function signedPercent(value: number): string {
   if (value > 0) return `+${value}%`;
   return `${value}%`;
