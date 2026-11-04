@@ -51,6 +51,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 
+/** Read the current session from context. */
 export function useSession() {
   const value = useContext(SessionContext);
   if (!value) throw new Error("Sesión no disponible");
