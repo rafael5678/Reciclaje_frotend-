@@ -1,3 +1,4 @@
+/** Carga el impacto del usuario y permite reintentar. */
 import { useCallback, useEffect, useState } from "react";
 import type { Impact } from "../models/types";
 import { impactService } from "../services/impactService";
