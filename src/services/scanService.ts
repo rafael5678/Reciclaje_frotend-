@@ -1,3 +1,4 @@
+/** Application service for scans. */
 import type { Scan, VisionHit } from "../models/types";
 import { scanRepository, type ScanDraft } from "../repositories/scanRepository";
 
