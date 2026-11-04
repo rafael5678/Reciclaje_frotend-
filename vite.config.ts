@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+// Serve ONNX Runtime WASM from /public/ort in dev.
 
 function serveOrtRuntime(): Plugin {
   const root = path.resolve("public/ort");
