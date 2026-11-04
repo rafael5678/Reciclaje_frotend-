@@ -1,4 +1,4 @@
-/** Panel de inicio con puntos, arbol y residuos recientes. */
+/** Home panel with points, tree, and recent waste. */
 import { Link } from "react-router-dom";
 import { CountUp } from "../components/CountUp";
 import { Icon } from "../components/Icons";
