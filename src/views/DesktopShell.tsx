@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import { Icon, type IconName } from "../components/Icons";
 import { Brand } from "../components/Logo";
 import { firstName, initials } from "../services/format";
-import { modelLabel } from "../services/healthService";
+import { modelLabel } from "../services/format";
 import { useSession } from "../context/SessionProvider";
 import { refreshServerHealth, useServerHealth } from "../hooks/useServerHealth";
 

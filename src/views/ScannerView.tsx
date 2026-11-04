@@ -5,7 +5,7 @@ import { Icon, stepIcon } from "../components/Icons";
 import { MATERIALS, materialByCode } from "../models/catalog";
 import type { BBox, VisionHit } from "../models/types";
 import { formatConfidence } from "../services/format";
-import { modelLabel } from "../services/healthService";
+import { modelLabel } from "../services/format";
 import { compactPhoto } from "../services/photo";
 import { scanService } from "../services/scanService";
 import { loadMira } from "../services/miraService";

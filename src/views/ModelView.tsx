@@ -1,6 +1,6 @@
 import { RecycleBag } from "../components/RecycleBag";
 import { StatTile } from "../components/StatTile";
-import { modelLabel } from "../services/healthService";
+import { modelLabel } from "../services/format";
 import { readVisionMeta } from "../services/visionService";
 import { refreshServerHealth, useServerHealth } from "../hooks/useServerHealth";
 

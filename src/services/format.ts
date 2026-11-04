@@ -53,6 +53,14 @@ export function signedPercent(value: number): string {
   return `${value}%`;
 }
 
+export function modelLabel(name: string): string {
+  return name
+    .split("-")
+    .filter((part) => part !== "preview")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }

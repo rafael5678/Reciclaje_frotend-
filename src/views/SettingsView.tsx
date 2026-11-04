@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { initials } from "../services/format";
-import { modelLabel } from "../services/healthService";
+import { modelLabel } from "../services/format";
 import { useSession } from "../context/SessionProvider";
 import { useServerHealth } from "../hooks/useServerHealth";
 
