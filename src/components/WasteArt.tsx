@@ -1,4 +1,4 @@
-/** Ilustraciones por tipo de material. */
+/** Illustrations by material type. */
 export function WasteArt({ code }: { code: string }) {
   return (
     <div className="art" data-code={code} aria-hidden="true">
