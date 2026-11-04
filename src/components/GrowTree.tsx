@@ -1,4 +1,4 @@
-/** Arbol que crece segun los puntos del ranking. */
+/** Tree that grows from ranking points. */
 import { groveFrom, type TreeKind } from "../services/forest";
 
 export function GrowTree({
