@@ -161,6 +161,7 @@ export async function findPoints(lat: number, lon: number): Promise<RecyclingPoi
   return [...merged.values()].sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
+/** Geocode a place name inside Pasto. */
 export async function searchPlace(text: string): Promise<Place | null> {
   const q = `${text.trim()}, Pasto, Nariño, Colombia`;
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=co&accept-language=es&q=${encodeURIComponent(q)}`;
