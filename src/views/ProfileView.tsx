@@ -1,3 +1,4 @@
+/** Perfil del usuario con puntos e impacto. */
 import { Link, useNavigate } from "react-router-dom";
 import { formatKg, formatPoints, initials } from "../services/format";
 import { useSession } from "../context/SessionProvider";
