@@ -1,4 +1,4 @@
-/** Genera un Excel minimo sin dependencias extra. */
+/** Builds a minimal XLSX without extra dependencies. */
 export type Cell = string | number;
 export type Sheet = { name: string; rows: Cell[][]; widths?: number[] };
 
