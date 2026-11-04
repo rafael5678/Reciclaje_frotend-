@@ -150,6 +150,7 @@ export const MATERIALS: Material[] = [
 
 export const MATERIAL_BY_CODE = Object.fromEntries(MATERIALS.map((item) => [item.code, item]));
 
+/** Look up a material, falling back to general waste. */
 export function materialByCode(code: string): Material {
   return MATERIAL_BY_CODE[code] ?? MATERIALS[0];
 }
