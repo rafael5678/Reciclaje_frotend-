@@ -1,3 +1,4 @@
+/** Ranking tree kind and growth stage. */
 export type TreeKind = "palmera" | "frutal" | "pino" | "roble" | "ceiba";
 
 export type Grove = {
