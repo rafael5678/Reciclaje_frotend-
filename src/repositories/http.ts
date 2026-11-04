@@ -25,6 +25,7 @@ export function apiUrl(path: string) {
   return `${getApiBase()}${path}`;
 }
 
+/** JSON request to the EcoScan API. */
 export async function api<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
   const headers = new Headers(options.headers);
   if (!headers.has("Content-Type") && options.body) headers.set("Content-Type", "application/json");
