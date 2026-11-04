@@ -1,3 +1,4 @@
+/** Persist the session in localStorage. */
 import type { Session } from "../models/types";
 
 class SessionRepository {
