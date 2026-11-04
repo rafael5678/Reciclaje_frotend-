@@ -19,6 +19,7 @@ function refresh(): Promise<void> {
   return inflight;
 }
 
+/** Force a health refresh. */
 export function refreshServerHealth() {
   return refresh();
 }
