@@ -1,4 +1,4 @@
-/** Tarjeta de estadistica con emoji y valor. */
+/** Stat tile with emoji and value. */
 import type { ReactNode } from "react";
 
 export function StatTile({ emoji, value, label }: { emoji: string; value: ReactNode; label: string }) {
