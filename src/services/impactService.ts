@@ -2,7 +2,7 @@ import type { Impact } from "../models/types";
 import { impactRepository } from "../repositories/impactRepository";
 import { mapScan } from "../repositories/scanRepository";
 
-export const impactService = {
+class ImpactService {
   async get(): Promise<Impact> {
     const raw = await impactRepository.get();
     return {
@@ -20,5 +20,7 @@ export const impactService = {
       categories: raw.categories,
       recent: raw.recent.map((scan) => mapScan(scan)),
     };
-  },
-};
+  }
+}
+
+export const impactService = new ImpactService();
