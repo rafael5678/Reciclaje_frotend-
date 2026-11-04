@@ -1,3 +1,4 @@
+/** Escena del planeta en la pantalla de inicio. */
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { ECO_FACTS } from "../models/facts";
 import { prefersReducedMotion } from "../services/motion";
