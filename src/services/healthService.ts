@@ -10,7 +10,7 @@ export const CHECKING: ServerHealth = {
   usedLastMinute: 0,
 };
 
-export const healthService = {
+class HealthService {
   async get(): Promise<ServerHealth> {
     try {
       const raw = await healthRepository.get();
@@ -28,13 +28,7 @@ export const healthService = {
     } catch (error) {
       return { ...CHECKING, state: "offline", error: error instanceof Error ? error.message : "Sin conexión con el servidor" };
     }
-  },
-};
-
-export function modelLabel(name: string): string {
-  return name
-    .split("-")
-    .filter((part) => part !== "preview")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  }
 }
+
+export const healthService = new HealthService();
