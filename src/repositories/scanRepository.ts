@@ -74,7 +74,7 @@ type AnalyzeRaw = {
   points_why?: string[];
 };
 
-export const scanRepository = {
+class ScanRepository {
   async analyzePhoto(file: File): Promise<VisionHit> {
     const token = sessionRepository.token();
     const raw = await apiUpload<AnalyzeRaw>("/api/analyze", file, token);
@@ -92,12 +92,14 @@ export const scanRepository = {
       points: raw.points,
       pointsWhy: raw.points_why,
     };
-  },
+  }
+
   async list(): Promise<Scan[]> {
     const token = sessionRepository.token();
     const rows = await api<ApiScan[]>("/api/scans", {}, token);
     return rows.map((row) => mapScan(row));
-  },
+  }
+
   async create(draft: ScanDraft, file?: File | null): Promise<Scan> {
     const token = sessionRepository.token();
     if (file) {
@@ -112,7 +114,8 @@ export const scanRepository = {
       }
     }
     return mapScan(await api<ApiScan>("/api/scans", { method: "POST", body: JSON.stringify(toBody(draft)) }, token));
-  },
+  }
+
   async photo(id: number): Promise<string | null> {
     const token = sessionRepository.token();
     const headers = new Headers();
@@ -124,8 +127,10 @@ export const scanRepository = {
     } catch {
       return null;
     }
-  },
-};
+  }
+}
+
+export const scanRepository = new ScanRepository();
 
 function toFields(draft: ScanDraft): Record<string, string> {
   return {
