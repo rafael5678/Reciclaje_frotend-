@@ -18,6 +18,7 @@ export function formatPoints(value: number): string {
   return value.toLocaleString("es-CO");
 }
 
+/** First token of a display name. */
 export function firstName(name: string): string {
   return name.trim().split(/\s+/)[0] || name;
 }
