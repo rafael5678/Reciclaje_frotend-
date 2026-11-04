@@ -1,3 +1,4 @@
+/** Classroom HTTP endpoints. */
 import { api } from "./http";
 import { sessionRepository } from "./sessionRepository";
 
