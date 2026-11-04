@@ -1,3 +1,4 @@
+/** GET /api/impact. */
 import { api } from "./http";
 import { mapScan } from "./scanRepository";
 import { sessionRepository } from "./sessionRepository";
