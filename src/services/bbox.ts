@@ -1,6 +1,7 @@
 /** Bounding-box helpers to fuse detections. */
 import type { BBox } from "../models/types";
 
+/** Clamp a number into [min, max]. */
 export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
