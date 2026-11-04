@@ -1,3 +1,4 @@
+/** Point thresholds and level titles. */
 const LEVELS = [
   { name: "Semilla", emoji: "🌱", from: 0 },
   { name: "Brote", emoji: "🌿", from: 50 },
