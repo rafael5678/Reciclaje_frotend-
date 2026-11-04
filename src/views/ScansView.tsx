@@ -1,3 +1,4 @@
+/** Historial de escaneos y exportacion a Excel. */
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { BinPill, CategoryBars, WeeklyChart } from "../components/Charts";
