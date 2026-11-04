@@ -1,4 +1,4 @@
-/** Barra inferior de la version movil. */
+/** Bottom tab bar for the mobile layout. */
 import { useEffect, useState } from "react";
 import { NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import { Icon, type IconName } from "../components/Icons";
