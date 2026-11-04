@@ -1,3 +1,4 @@
+/** Inicio de sesion y registro con formulario limpio al cambiar de pestana. */
 import { useRef, useState, type FormEvent, type PointerEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Icon, type IconName } from "../components/Icons";
