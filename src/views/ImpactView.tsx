@@ -1,3 +1,4 @@
+/** Resumen de impacto en la app movil. */
 import { BinPill, Delta, Legend, StackBar } from "../components/Charts";
 import { LoadState } from "../components/LoadState";
 import { WasteArt } from "../components/WasteArt";
