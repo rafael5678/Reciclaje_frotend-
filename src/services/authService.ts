@@ -1,3 +1,4 @@
+/** Login, register, guest, and session restore. */
 import type { Session, User } from "../models/types";
 import { authRepository } from "../repositories/authRepository";
 import { ApiError } from "../repositories/http";
