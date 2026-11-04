@@ -1,3 +1,4 @@
+/** Consulta periodica de /api/health. */
 import { useEffect, useState } from "react";
 import type { ServerHealth } from "../models/types";
 import { CHECKING, healthService } from "../services/healthService";
