@@ -174,6 +174,7 @@ export async function searchPlace(text: string): Promise<Place | null> {
   return place;
 }
 
+/** Google Maps directions URL. */
 export function directionsUrl(point: RecyclingPoint, from?: Place): string {
   const origin = from ? `&origin=${from.lat},${from.lon}` : "";
   return `https://www.google.com/maps/dir/?api=1${origin}&destination=${point.lat},${point.lon}&travelmode=walking`;
