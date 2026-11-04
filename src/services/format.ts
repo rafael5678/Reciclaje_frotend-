@@ -29,6 +29,7 @@ export function initials(name: string): string {
   return parts.map((part) => part[0]?.toUpperCase() ?? "").join("") || "E";
 }
 
+/** Relative day plus time in es-CO. */
 export function formatWhen(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
