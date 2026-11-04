@@ -8,6 +8,7 @@ export function formatPercent(value: number): string {
   return `${Math.round(value)}%`;
 }
 
+/** Format kilograms with one decimal. */
 export function formatKg(value: number): string {
   return `${value.toFixed(1)} kg`;
 }
