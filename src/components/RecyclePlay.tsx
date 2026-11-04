@@ -1,4 +1,4 @@
-/** Mini juego de arrastrar residuos al contenedor. */
+/** Mini-game: drag waste into the bin. */
 import { useMemo, useState } from "react";
 import { MATERIALS } from "../models/catalog";
 import { RecycleBag } from "./RecycleBag";
