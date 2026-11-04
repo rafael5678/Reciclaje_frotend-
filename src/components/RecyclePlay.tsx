@@ -1,3 +1,4 @@
+/** Mini juego de arrastrar residuos al contenedor. */
 import { useMemo, useState } from "react";
 import { MATERIALS } from "../models/catalog";
 import { RecycleBag } from "./RecycleBag";
