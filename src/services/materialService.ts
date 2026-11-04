@@ -1,8 +1,10 @@
 import type { Material } from "../models/types";
 import { materialRepository } from "../repositories/materialRepository";
 
-export const materialService = {
+class MaterialService {
   list(): Promise<Material[]> {
     return materialRepository.list();
-  },
-};
+  }
+}
+
+export const materialService = new MaterialService();
