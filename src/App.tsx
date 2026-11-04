@@ -1,3 +1,4 @@
+/** Rutas de EcoScan: bienvenida, cuenta, panel de escritorio y app movil. */
 import { lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Logo } from "./components/Logo";
