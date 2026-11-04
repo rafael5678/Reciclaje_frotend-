@@ -11,6 +11,7 @@ export function boxJump(a: BBox, b: BBox) {
   return Math.hypot(a.x + a.w / 2 - (b.x + b.w / 2), a.y + a.h / 2 - (b.y + b.h / 2));
 }
 
+/** Interpolate two bounding boxes. */
 export function mixBox(from: BBox, to: BBox, amount: number): BBox {
   const keep = 1 - amount;
   return {
