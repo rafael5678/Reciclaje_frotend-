@@ -10,7 +10,7 @@ import { useSession } from "./SessionProvider";
 
 export function WelcomeView() {
   const navigate = useNavigate();
-  const { session, setSession } = useSession();
+  const { session, setSession, logout } = useSession();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
@@ -76,7 +76,13 @@ export function WelcomeView() {
         <button className="cta cta-glow cta-xl" onClick={() => void go(wide ? "/panel" : "/app/escaner")} disabled={busy}>
           {busy ? "Entrando…" : session ? `Seguir como ${session.user.name.split(" ")[0]} →` : "Comenzar →"}
         </button>
-        <button className="ghost-link" onClick={() => navigate("/login")}>
+        <button
+          className="ghost-link"
+          onClick={() => {
+            if (session) logout();
+            navigate("/login");
+          }}
+        >
           {session ? "Entrar con otra cuenta" : "Iniciar sesión"}
         </button>
         <button className="ghost-link dim" onClick={() => void go("/panel")} disabled={busy}>Abrir panel de escritorio</button>

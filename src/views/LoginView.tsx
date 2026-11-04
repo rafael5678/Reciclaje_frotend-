@@ -63,6 +63,16 @@ export function LoginView() {
     card.current?.style.setProperty("--rx", "0deg");
   }
 
+  function switchMode(next: "login" | "register") {
+    setMode(next);
+    setError("");
+    setName("");
+    setEmail("");
+    setPassword("");
+    setShowPassword(false);
+    setDone(false);
+  }
+
   const label = mode === "login" ? "Entrar" : "Crear cuenta";
 
   return (
@@ -79,8 +89,8 @@ export function LoginView() {
         <Brand />
         <div className="auth-tabs" role="tablist" data-mode={mode}>
           <span className="auth-tabs-pill" />
-          <button role="tab" type="button" aria-selected={mode === "login"} onClick={() => { setMode("login"); setError(""); }}>Iniciar sesión</button>
-          <button role="tab" type="button" aria-selected={mode === "register"} onClick={() => { setMode("register"); setError(""); }}>Crear cuenta</button>
+          <button role="tab" type="button" aria-selected={mode === "login"} onClick={() => switchMode("login")}>Iniciar sesión</button>
+          <button role="tab" type="button" aria-selected={mode === "register"} onClick={() => switchMode("register")}>Crear cuenta</button>
         </div>
         <p className="auth-lead">
           {mode === "login" ? "Qué bueno verte de nuevo. Tu historial te espera." : "Crea tu cuenta y guarda cada residuo que separes."}
@@ -90,11 +100,11 @@ export function LoginView() {
         <form onSubmit={submit} className="form auth-form" key={mode}>
           {mode === "register" ? (
             <Field icon="user" label="Nombre">
-              <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} autoComplete="name" placeholder=" " />
+              <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} autoComplete="off" placeholder=" " />
             </Field>
           ) : null}
           <Field icon="mail" label="Correo">
-            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete="email" placeholder=" " />
+            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete={mode === "login" ? "username" : "off"} placeholder=" " />
           </Field>
           <Field
             icon="lock"
