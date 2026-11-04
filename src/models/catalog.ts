@@ -1,4 +1,4 @@
-/** Catalogo local de materiales si el API no responde. */
+/** Local material catalog used when the API is down. */
 import type { Material } from "./types";
 
 export const MATERIALS: Material[] = [
