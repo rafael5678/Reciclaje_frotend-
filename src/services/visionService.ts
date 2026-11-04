@@ -1,9 +1,7 @@
 import { materialByCode } from "../models/catalog";
-import type { BBox, VisionHit } from "../models/types";
+import type { VisionHit } from "../models/types";
 
 const META_KEY = "ecoscan.vision";
-const CODES = ["PET", "HDPE", "MLT", "PAP", "VID", "MET", "ORG", "GEN"] as const;
-export type SampleKind = (typeof CODES)[number];
 
 export type Frame = {
   data: Uint8ClampedArray;
@@ -28,42 +26,6 @@ type Features = {
   aspect: number;
 };
 
-export class VisionEngine {
-  private last: VisionHit | null = null;
-  private misses = 0;
-  frames = 0;
-  lastMs = 0;
-
-  analyze(frame: Frame): VisionHit | null {
-    const started = performance.now();
-    const hit = detectFrame(frame);
-    const ms = performance.now() - started;
-    this.frames += 1;
-    this.lastMs = ms;
-    if (!hit) {
-      this.misses += 1;
-      if (this.misses > 2) this.last = null;
-      return this.last ? { ...this.last, inferenceMs: ms } : null;
-    }
-    this.misses = 0;
-    hit.inferenceMs = ms;
-    if (this.last) {
-      const jump = boxJump(this.last.bbox, hit.bbox);
-      const follow = jump > 0.06 ? 1 : 0.9;
-      const samePlace = jump < 0.12 && boxOverlap(this.last.bbox, hit.bbox) > 0.35;
-      if (samePlace && this.last.material.code !== hit.material.code && hit.confidence + 0.15 < this.last.confidence) {
-        this.last = { ...this.last, bbox: mixBox(this.last.bbox, hit.bbox, follow), inferenceMs: ms };
-        rememberVision(ms, this.last.confidence);
-        return this.last;
-      }
-      hit.bbox = mixBox(this.last.bbox, hit.bbox, follow);
-    }
-    this.last = hit;
-    rememberVision(ms, hit.confidence);
-    return hit;
-  }
-}
-
 export function rememberVision(ms: number, confidence: number) {
   localStorage.setItem(META_KEY, JSON.stringify({ ms: Math.max(1, Math.round(ms)), confidence, at: Date.now() }));
 }
@@ -75,14 +37,6 @@ export function readVisionMeta(): { ms: number; confidence: number; at: number }
   } catch {
     return null;
   }
-}
-
-export function evaluateSample(kind: SampleKind): VisionHit | null {
-  return detectFrame(buildSample(kind));
-}
-
-export function sampleKinds(): SampleKind[] {
-  return [...CODES];
 }
 
 export function detectFrame(frame: Frame): VisionHit | null {
@@ -1040,71 +994,6 @@ function borderColor(data: Uint8ClampedArray, width: number, height: number): [n
   return [median(allR), median(allG), median(allB)];
 }
 
-function buildSample(kind: SampleKind): Frame {
-  const width = 160;
-  const height = 128;
-  const data = new Uint8ClampedArray(width * height * 4);
-  const rand = mulberry32(kind.length * 97 + kind.charCodeAt(0));
-  fill(data, width, 0, 0, width, height, [214, 208, 198], rand, 8);
-  if (kind === "PET") {
-    fill(data, width, 62, 22, 40, 94, [186, 214, 228], rand, 22);
-    fill(data, width, 68, 12, 28, 14, [176, 32, 42], rand, 8);
-  }
-  if (kind === "HDPE") fill(data, width, 38, 28, 86, 78, [244, 244, 240], rand, 6);
-  if (kind === "MLT") {
-    fill(data, width, 34, 24, 92, 82, [246, 246, 242], rand, 4);
-    fill(data, width, 42, 34, 28, 22, [214, 54, 68], rand, 4);
-    fill(data, width, 78, 34, 34, 18, [36, 110, 196], rand, 4);
-    fill(data, width, 48, 68, 60, 22, [242, 184, 48], rand, 4);
-  }
-  if (kind === "PAP") fill(data, width, 30, 22, 100, 84, [156, 108, 62], rand, 14);
-  if (kind === "VID") fill(data, width, 64, 14, 34, 100, [58, 156, 86], rand, 8);
-  if (kind === "MET") {
-    fill(data, width, 58, 18, 46, 96, [168, 172, 176], rand, 8);
-    fill(data, width, 58, 30, 46, 8, [236, 238, 240], rand, 2);
-    fill(data, width, 58, 70, 46, 10, [92, 96, 100], rand, 2);
-  }
-  if (kind === "ORG") fill(data, width, 46, 36, 70, 58, [232, 176, 42], rand, 16);
-  if (kind === "GEN") {
-    for (let y = 18; y < 110; y += 8) {
-      for (let x = 28; x < 132; x += 8) {
-        const hue = Math.floor(rand() * 5);
-        const colors: [number, number, number][] = [
-          [220, 40, 70],
-          [40, 80, 210],
-          [240, 210, 30],
-          [20, 20, 20],
-          [80, 200, 120],
-        ];
-        fill(data, width, x, y, 8, 8, colors[hue], rand, 30);
-      }
-    }
-  }
-  return { data, width, height };
-}
-
-function fill(
-  data: Uint8ClampedArray,
-  width: number,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  color: [number, number, number],
-  rand: () => number,
-  noise: number,
-) {
-  for (let row = y; row < y + h; row += 1) {
-    for (let col = x; col < x + w; col += 1) {
-      const index = (row * width + col) * 4;
-      data[index] = clampByte(color[0] + (rand() - 0.5) * noise);
-      data[index + 1] = clampByte(color[1] + (rand() - 0.5) * noise);
-      data[index + 2] = clampByte(color[2] + (rand() - 0.5) * noise);
-      data[index + 3] = 255;
-    }
-  }
-}
-
 function rgbToHsv(red: number, green: number, blue: number) {
   const r = red / 255;
   const g = green / 255;
@@ -1133,45 +1022,6 @@ function median(values: number[]): number {
   return sorted[Math.floor(sorted.length / 2)];
 }
 
-function boxJump(a: BBox, b: BBox) {
-  const ax = a.x + a.w / 2;
-  const ay = a.y + a.h / 2;
-  const bx = b.x + b.w / 2;
-  const by = b.y + b.h / 2;
-  return Math.hypot(ax - bx, ay - by);
-}
-
-function boxOverlap(a: BBox, b: BBox) {
-  const x = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
-  const y = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
-  const union = a.w * a.h + b.w * b.h - x * y;
-  return union <= 0 ? 0 : (x * y) / union;
-}
-
-function mixBox(from: BBox, to: BBox, amount: number): BBox {
-  const keep = 1 - amount;
-  return {
-    x: from.x * keep + to.x * amount,
-    y: from.y * keep + to.y * amount,
-    w: from.w * keep + to.w * amount,
-    h: from.h * keep + to.h * amount,
-  };
-}
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
-}
-
-function clampByte(value: number) {
-  return Math.max(0, Math.min(255, Math.round(value)));
-}
-
-function mulberry32(seed: number) {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
