@@ -1,3 +1,4 @@
+/** Format a 0-1 score as a percent. */
 export function formatConfidence(value: number, digits = 1): string {
   return `${(value * 100).toFixed(digits)}%`;
 }
