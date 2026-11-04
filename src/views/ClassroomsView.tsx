@@ -1,3 +1,4 @@
+/** Salones, codigo rotativo e ranking del grupo. */
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { GrowTree } from "../components/GrowTree";
