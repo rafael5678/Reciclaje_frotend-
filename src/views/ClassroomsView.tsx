@@ -1,4 +1,4 @@
-/** Salones, codigo rotativo e ranking del grupo. */
+/** Classrooms, rotating invite code, and group ranking. */
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { GrowTree } from "../components/GrowTree";
