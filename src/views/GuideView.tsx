@@ -1,3 +1,4 @@
+/** Guia de materiales y contenedores. */
 import { useEffect, useState } from "react";
 import { BinPill } from "../components/Charts";
 import { Icon, stepIcon } from "../components/Icons";
