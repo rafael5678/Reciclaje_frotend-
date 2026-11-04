@@ -1,3 +1,4 @@
+/** Explica Gemini, MIRA y TrashNet. */
 import { RecycleBag } from "../components/RecycleBag";
 import { StatTile } from "../components/StatTile";
 import { modelLabel } from "../services/format";
