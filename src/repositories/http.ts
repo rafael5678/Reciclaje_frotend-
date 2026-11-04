@@ -20,6 +20,7 @@ function getApiBase() {
   return "";
 }
 
+/** Build an absolute or same-origin API URL. */
 export function apiUrl(path: string) {
   return `${getApiBase()}${path}`;
 }
