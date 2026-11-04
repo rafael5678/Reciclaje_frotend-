@@ -1,3 +1,4 @@
+/** Cuenta, estado del servidor y modelos de IA. */
 import { Link, useNavigate } from "react-router-dom";
 import { initials } from "../services/format";
 import { modelLabel } from "../services/format";
