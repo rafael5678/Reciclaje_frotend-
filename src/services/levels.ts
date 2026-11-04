@@ -13,16 +13,24 @@ export type Level = {
   progress: number;
 };
 
+class LevelTrack {
+  for(points: number): Level {
+    let index = 0;
+    for (let i = 0; i < LEVELS.length; i += 1) if (points >= LEVELS[i].from) index = i;
+    const current = LEVELS[index];
+    const next = LEVELS[index + 1];
+    if (!next) return { name: current.name, emoji: current.emoji, next: null, progress: 1 };
+    return {
+      name: current.name,
+      emoji: current.emoji,
+      next: { name: next.name, missing: next.from - points },
+      progress: (points - current.from) / (next.from - current.from),
+    };
+  }
+}
+
+const track = new LevelTrack();
+
 export function levelFor(points: number): Level {
-  let index = 0;
-  for (let i = 0; i < LEVELS.length; i += 1) if (points >= LEVELS[i].from) index = i;
-  const current = LEVELS[index];
-  const next = LEVELS[index + 1];
-  if (!next) return { name: current.name, emoji: current.emoji, next: null, progress: 1 };
-  return {
-    name: current.name,
-    emoji: current.emoji,
-    next: { name: next.name, missing: next.from - points },
-    progress: (points - current.from) / (next.from - current.from),
-  };
+  return track.for(points);
 }
