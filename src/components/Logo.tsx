@@ -1,3 +1,4 @@
+/** Marca EcoScan: isotipo y nombre. */
 import { useId } from "react";
 
 export function Logo({ size = 42 }: { size?: number }) {
