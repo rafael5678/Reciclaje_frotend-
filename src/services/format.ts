@@ -43,6 +43,7 @@ export function formatWhen(iso: string): string {
   return `${days[date.getDay()]} ${date.getDate()} · ${time}`;
 }
 
+/** Short relative time label. */
 export function formatAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const minutes = Math.max(0, Math.round(diff / 60000));
