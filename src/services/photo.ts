@@ -1,4 +1,4 @@
-/** JPEG liviano para no tumbar Render al guardar el escaneo. */
+/** Compact JPEG so Render is not overloaded when saving a scan. */
 
 class PhotoCompressor {
   async compact(file: File, maxSide = 1280, quality = 0.82): Promise<File> {
