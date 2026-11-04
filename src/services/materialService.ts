@@ -1,3 +1,4 @@
+/** Application service for the material guide. */
 import type { Material } from "../models/types";
 import { materialRepository } from "../repositories/materialRepository";
 
