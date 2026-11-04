@@ -1,3 +1,4 @@
+/** Utilidades de recuadro para fusionar detecciones. */
 import type { BBox } from "../models/types";
 
 export function clamp(value: number, min: number, max: number) {
