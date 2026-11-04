@@ -1,4 +1,4 @@
-/** Informe imprimible del historial. */
+/** Printable history report. */
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LoadState } from "../components/LoadState";
