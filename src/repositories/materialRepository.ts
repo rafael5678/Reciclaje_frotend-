@@ -42,7 +42,7 @@ export function mapMaterial(raw: ApiMaterial): Material {
   };
 }
 
-export const materialRepository = {
+class MaterialRepository {
   async list(): Promise<Material[]> {
     try {
       const rows = await api<ApiMaterial[]>("/api/materials");
@@ -50,5 +50,7 @@ export const materialRepository = {
     } catch {
       return MATERIALS;
     }
-  },
-};
+  }
+}
+
+export const materialRepository = new MaterialRepository();
