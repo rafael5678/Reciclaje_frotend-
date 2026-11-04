@@ -1,4 +1,4 @@
-/** Graficas de impacto semanal y por categoria. */
+/** Weekly and category impact charts. */
 import type { CategoryStat, DayStat } from "../models/types";
 
 export function WeeklyChart({ days }: { days: DayStat[] }) {
