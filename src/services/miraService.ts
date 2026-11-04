@@ -1,6 +1,5 @@
 import * as ort from "onnxruntime-web/wasm";
 import { materialByCode } from "../models/catalog";
-import type { Frame } from "./visionService";
 import type { Score, VisionHit } from "../models/types";
 
 const INPUT_SIZE = 640;
@@ -24,7 +23,7 @@ type Detection = {
 };
 
 let sessionPromise: Promise<ort.InferenceSession> | null = null;
-const scratch = { source: null as HTMLCanvasElement | null, letter: null as HTMLCanvasElement | null };
+const scratch = { letter: null as HTMLCanvasElement | null };
 
 ort.env.wasm.wasmPaths = "/ort/";
 ort.env.wasm.numThreads = 1;
@@ -40,16 +39,6 @@ export function loadMira() {
     });
   }
   return sessionPromise;
-}
-
-export async function detectMira(frame: Frame): Promise<VisionHit | null> {
-  if (!scratch.source) scratch.source = document.createElement("canvas");
-  scratch.source.width = frame.width;
-  scratch.source.height = frame.height;
-  const context = scratch.source.getContext("2d", { willReadFrequently: true });
-  if (!context) return null;
-  context.putImageData(new ImageData(new Uint8ClampedArray(frame.data), frame.width, frame.height), 0, 0);
-  return detectMiraFromCanvas(scratch.source);
 }
 
 export async function detectMiraFromCanvas(source: HTMLCanvasElement): Promise<VisionHit | null> {
