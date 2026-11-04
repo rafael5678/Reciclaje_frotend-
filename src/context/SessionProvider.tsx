@@ -1,4 +1,4 @@
-/** Contexto de sesion para toda la aplicacion. */
+/** Session context for the whole app. */
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session } from "../models/types";
 import { authService } from "../services/authService";
