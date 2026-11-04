@@ -149,6 +149,7 @@ export function localPastoPoints(lat: number, lon: number): RecyclingPoint[] {
   return PASTO_DROPOFFS.map((item) => withTravel(item, origin.lat, origin.lon)).sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
+/** Merge curated points with OSM results. */
 export async function findPoints(lat: number, lon: number): Promise<RecyclingPoint[]> {
   const origin: Place = inPasto(lat, lon) ? { lat, lon, label: "Tu ubicación" } : PASTO;
   const merged = new Map<string, RecyclingPoint>();
