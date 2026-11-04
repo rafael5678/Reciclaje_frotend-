@@ -1,4 +1,4 @@
-/** Resultado del ultimo escaneo y pasos para reciclarlo. */
+/** Last scan result and recycling steps. */
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { kindForMaterial } from "../services/pointsService";
 import { Icon, stepIcon } from "../components/Icons";
