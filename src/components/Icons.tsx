@@ -1,4 +1,4 @@
-/** Iconos SVG compartidos de la interfaz. */
+/** Shared SVG icons for the UI. */
 import type { ReactNode } from "react";
 
 export type IconName =
