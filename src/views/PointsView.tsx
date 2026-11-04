@@ -1,3 +1,4 @@
+/** Mapa de puntos de reciclaje en Pasto. */
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
