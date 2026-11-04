@@ -1,3 +1,4 @@
+/** Genera un Excel minimo sin dependencias extra. */
 export type Cell = string | number;
 export type Sheet = { name: string; rows: Cell[][]; widths?: number[] };
 
