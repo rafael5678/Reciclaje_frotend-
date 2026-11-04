@@ -1,3 +1,4 @@
+/** Miniatura del escaneo o ilustracion si no hay foto. */
 import { useEffect, useState } from "react";
 import type { Scan } from "../models/types";
 import { scanRepository } from "../repositories/scanRepository";
