@@ -12,7 +12,7 @@ const GET_RETRIES = [2500, 8000];
 const REQUEST_MS = 90_000;
 const PRODUCTION_API = "https://reciclaje-backend-cxav.onrender.com";
 
-export function getApiBase() {
+function getApiBase() {
   const env = String(import.meta.env.VITE_API_URL || "").trim().replace(/\/$/, "");
   if (env) return env;
   if (import.meta.env.PROD) return PRODUCTION_API;
