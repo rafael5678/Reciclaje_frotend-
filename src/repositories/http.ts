@@ -41,6 +41,7 @@ export async function api<T>(path: string, options: RequestInit = {}, token?: st
   return readJson<T>(response);
 }
 
+/** Multipart upload to the EcoScan API. */
 export async function apiUpload<T>(
   path: string,
   file: File,
