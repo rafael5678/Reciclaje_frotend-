@@ -1,3 +1,4 @@
+/** Maps /api/impact into UI state. */
 import type { Impact } from "../models/types";
 import { impactRepository } from "../repositories/impactRepository";
 import { mapScan } from "../repositories/scanRepository";
