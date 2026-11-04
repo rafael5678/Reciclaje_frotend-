@@ -7,6 +7,7 @@ const MAIN = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
 const REL = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 const PKG = "http://schemas.openxmlformats.org/package/2006/relationships";
 
+/** Build an XLSX blob from sheet rows. */
 export function buildXlsx(sheets: Sheet[]): Blob {
   const files: [string, string][] = [
     ["[Content_Types].xml", contentTypes(sheets.length)],
