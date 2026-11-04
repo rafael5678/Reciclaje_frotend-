@@ -2,6 +2,7 @@
   "name": "ecoscan",
   "private": true,
   "version": "1.0.0",
+  "description": "EcoScan: clasifica residuos con foto y guía el reciclaje.",
   "type": "module",
   "scripts": {
     "dev": "vite",
