@@ -1,4 +1,4 @@
-/** Tipos de dominio compartidos por vistas y servicios. */
+/** Shared domain types for views and services. */
 export type Material = {
   code: string;
   name: string;
