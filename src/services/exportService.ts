@@ -1,3 +1,4 @@
+/** Excel export of impact and history. */
 import type { Impact, Scan } from "../models/types";
 import { buildXlsx, download } from "./xlsx";
 
