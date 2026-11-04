@@ -1,4 +1,4 @@
-/** Cliente HTTP hacia FastAPI, con reintentos en GET. */
+/** HTTP client for FastAPI, with GET retries. */
 export class ApiError extends Error {
   status: number;
 
