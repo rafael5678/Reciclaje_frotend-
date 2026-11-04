@@ -1,3 +1,4 @@
+/** Load and run the on-device MIRA ONNX detector. */
 import * as ort from "onnxruntime-web/wasm";
 import { materialByCode } from "../models/catalog";
 import type { Score, VisionHit } from "../models/types";
