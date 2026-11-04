@@ -1,3 +1,4 @@
+/** Panel de impacto sobre el planeta de bienvenida. */
 import type { Impact } from "../models/types";
 import { CountUp, Ring } from "./CountUp";
 import { Icon } from "./Icons";
