@@ -1,3 +1,4 @@
+/** Vite env typings for VITE_API_URL. */
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
