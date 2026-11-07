@@ -21,7 +21,7 @@ export type LabPiece = {
   hint: string;
 };
 
-export type SpecimenKind = "bottle" | "glass" | "paper" | "box" | "peel" | "napkin";
+export type SpecimenKind = "bottle" | "glass" | "paper" | "box" | "peel" | "napkin" | "jug" | "carton" | "can";
 
 export type LabSpecimen = {
   id: string;
@@ -29,6 +29,11 @@ export type LabSpecimen = {
   blurb: string;
   kind: SpecimenKind;
   pieceIds: string[];
+  materialCode: string;
+  fromScan?: boolean;
+  container?: string;
+  steps?: string[];
+  confidence?: number;
 };
 
 export type LabThrowResult = {
