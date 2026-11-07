@@ -26,12 +26,17 @@ export function apiUrl(path: string) {
 }
 
 /** JSON request to the EcoScan API. */
-export async function api<T>(path: string, options: RequestInit = {}, token?: string | null): Promise<T> {
+export async function api<T>(
+  path: string,
+  options: RequestInit = {},
+  token?: string | null,
+  extra?: { retries?: number[] },
+): Promise<T> {
   const headers = new Headers(options.headers);
   if (!headers.has("Content-Type") && options.body) headers.set("Content-Type", "application/json");
   if (token) headers.set("Authorization", `Bearer ${token}`);
   const method = (options.method ?? "GET").toUpperCase();
-  const retries = method === "GET" ? GET_RETRIES : [];
+  const retries = extra?.retries ?? (method === "GET" ? GET_RETRIES : []);
 
   const response = await send(() => fetch(apiUrl(path), { ...options, headers }), retries);
   if (!response.ok) {

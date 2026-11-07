@@ -1,7 +1,9 @@
 /** POST /api/lab/throw */
 import type { LabThrowResult } from "../models/lab";
-import { api } from "./http";
+import { ApiError, api } from "./http";
 import { sessionRepository } from "./sessionRepository";
+
+const MISSING_KEY = "ecoscan.labThrowMissing";
 
 type Raw = {
   correct: boolean;
@@ -16,11 +18,22 @@ type Raw = {
 
 class LabRepository {
   async throw(pieceId: string, binId: string): Promise<LabThrowResult> {
-    const raw = await api<Raw>(
-      "/api/lab/throw",
-      { method: "POST", body: JSON.stringify({ piece_id: pieceId, bin_id: binId }) },
-      sessionRepository.token(),
-    );
+    if (sessionStorage.getItem(MISSING_KEY)) {
+      throw new ApiError(404, "El laboratorio en el servidor aún no está listo");
+    }
+    let raw: Raw;
+    try {
+      raw = await api<Raw>(
+        "/api/lab/throw",
+        { method: "POST", body: JSON.stringify({ piece_id: pieceId, bin_id: binId }) },
+        sessionRepository.token(),
+      );
+    } catch (error) {
+      if (error instanceof ApiError && (error.status === 404 || error.status === 405)) {
+        sessionStorage.setItem(MISSING_KEY, "1");
+      }
+      throw error;
+    }
     return {
       correct: raw.correct,
       delta: raw.delta,

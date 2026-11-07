@@ -14,6 +14,6 @@ export type ApiHealth = {
 
 export const healthRepository = {
   get() {
-    return api<ApiHealth>("/api/health");
+    return api<ApiHealth>("/api/health", {}, null, { retries: [] });
   },
 };
