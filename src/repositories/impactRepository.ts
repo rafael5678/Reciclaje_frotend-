@@ -17,6 +17,7 @@ export type ApiImpact = {
   weekly: { label: string; count: number; is_today: boolean }[];
   categories: { name: string; count: number; percent: number; color: string }[];
   recent: Parameters<typeof mapScan>[0][];
+  lab_penalty?: number;
 };
 
 export const impactRepository = {

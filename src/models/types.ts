@@ -69,6 +69,7 @@ export type Impact = {
   weekly: DayStat[];
   categories: CategoryStat[];
   recent: Scan[];
+  labPenalty?: number;
 };
 
 export type User = {

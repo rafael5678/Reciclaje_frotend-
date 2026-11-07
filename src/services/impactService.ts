@@ -20,6 +20,7 @@ class ImpactService {
       weekly: raw.weekly.map((day) => ({ label: day.label, count: day.count, isToday: day.is_today })),
       categories: raw.categories,
       recent: raw.recent.map((scan) => mapScan(scan)),
+      labPenalty: raw.lab_penalty ?? 0,
     };
   }
 }
