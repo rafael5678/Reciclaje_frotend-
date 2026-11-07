@@ -14,6 +14,7 @@ export type RecyclingPoint = {
   walkMin: number;
   driveMin: number;
   address?: string;
+  campus?: "ucc";
 };
 
 export type Place = { lat: number; lon: number; label: string };
@@ -31,6 +32,7 @@ export const PASTO_BARRIOS: Place[] = [
   { label: "San Vicente", lat: 1.2205, lon: -77.2656 },
   { label: "El Tejar", lat: 1.1988, lon: -77.2770 },
   { label: "Lorenzo", lat: 1.2080, lon: -77.2920 },
+  { label: "UCC Torobajo", lat: 1.22976, lon: -77.2899 },
 ];
 
 const TAG_KIND: Record<string, PointKind> = {
@@ -70,6 +72,42 @@ const OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.k
 const ALL_KINDS: PointKind[] = ["Plástico", "Papel y cartón", "Vidrio", "Metal", "Orgánico"];
 
 const PASTO_DROPOFFS: Omit<RecyclingPoint, "distanceKm" | "walkMin" | "driveMin">[] = [
+  {
+    id: "ucc/torobajo",
+    lat: 1.22976,
+    lon: -77.2899,
+    name: "UCC Pasto — sede principal Torobajo",
+    kinds: [...ALL_KINDS, "Pilas", "Electrónicos"],
+    hours: "Lun–Vie 6:00–22:00 · Sáb 6:00–15:00",
+    operator: "Universidad Cooperativa de Colombia",
+    isCentre: false,
+    campus: "ucc",
+    address: "Calle 18 #45-150, Torobajo · cafetería, portería y pasillos (puntos ecológicos)",
+  },
+  {
+    id: "ucc/pandiaco",
+    lat: 1.2292,
+    lon: -77.2886,
+    name: "UCC Pasto — parqueaderos y canchas (Pandiaco)",
+    kinds: [...ALL_KINDS],
+    hours: "Mismo horario de campus",
+    operator: "Universidad Cooperativa de Colombia",
+    isCentre: false,
+    campus: "ucc",
+    address: "Barrio Pandiaco, misma manzana de la sede principal",
+  },
+  {
+    id: "ucc/consultorio",
+    lat: 1.2138,
+    lon: -77.2776,
+    name: "UCC Pasto — consultorio jurídico (centro)",
+    kinds: ["Papel y cartón", "Plástico", "Pilas"],
+    hours: "Días hábiles",
+    operator: "Universidad Cooperativa de Colombia",
+    isCentre: false,
+    campus: "ucc",
+    address: "Centro histórico, cerca a juzgados y Palacio de Justicia",
+  },
   {
     id: "pasto/emas-sede",
     lat: 1.21402,
@@ -188,6 +226,29 @@ export function kindForMaterial(code: string): PointKind {
   if (code === "ORG") return "Orgánico";
   if (code === "GEN") return "Electrónicos";
   return "Plástico";
+}
+
+/** Where to drop a classified item: UCC campus (color) vs city of Pasto. */
+const UCC_TOROBAJO: Place = { lat: 1.22976, lon: -77.2899, label: "UCC Torobajo" };
+
+export function dropAdvice(code: string, container: string, from: Place = UCC_TOROBAJO) {
+  const kind = kindForMaterial(code);
+  const points = localPastoPoints(from.lat, from.lon);
+  const campus = points.filter((point) => point.campus === "ucc" && (point.kinds.includes(kind) || kind === "Electrónicos"));
+  const city = points.filter((point) => point.campus !== "ucc" && (point.kinds.includes(kind) || (kind === "Electrónicos" && point.kinds.includes("Pilas"))));
+  const general = code === "GEN";
+  const campusPoint = campus.find((point) => point.id === "ucc/torobajo") ?? campus[0] ?? null;
+  return {
+    kind,
+    bin: container,
+    campusTitle: general ? "En la Cooperativa: caneca de no aprovechables" : `En la Cooperativa: contenedor ${container.toLowerCase()}`,
+    campusBody: general
+      ? "En Torobajo, Pandiaco o el consultorio jurídico busca el punto ecológico (portería, cafetería o pasillos) y deposítalo en la caneca gris o negra. No publicamos GPS de cada caneca interior."
+      : "Tres sedes UCC Pasto: Torobajo (Calle 18 #45-150), parqueaderos/canchas en Pandiaco y consultorio jurídico en el centro. En campus usa el color del contenedor en portería, cafetería o pasillos (Reduce tu Huella).",
+    campusPoint,
+    cityPoint: city[0] ?? null,
+    mapHref: `/panel/puntos?tipo=${encodeURIComponent(kind)}&campus=ucc`,
+  };
 }
 
 /** Walking time label. */

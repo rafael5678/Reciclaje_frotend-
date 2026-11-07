@@ -6,6 +6,7 @@ import { DesktopScanView } from "./views/DesktopScanView";
 import { DesktopShell } from "./views/DesktopShell";
 import { DashboardView } from "./views/DashboardView";
 import { GuideView } from "./views/GuideView";
+import { LabView } from "./views/LabView";
 import { ImpactView } from "./views/ImpactView";
 import { LoginView } from "./views/LoginView";
 import { ModelView } from "./views/ModelView";
@@ -51,6 +52,7 @@ export function App() {
           <Route path="configuracion" element={<SettingsView />} />
           <Route path="resultado" element={<ResultView />} />
           <Route path="puntos" element={<Later><PointsView /></Later>} />
+          <Route path="laboratorio" element={<LabView />} />
           <Route path="salones" element={<Later><ClassroomsView /></Later>} />
         </Route>
         <Route path="/reporte" element={<Later><ReportView /></Later>} />

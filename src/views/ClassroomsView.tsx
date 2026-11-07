@@ -191,6 +191,7 @@ export function ClassroomsView() {
                   <small className="code-ttl">{invite.expiresIn}s</small>
                 </button>
               </header>
+              <RaceBoard rows={ranking.rows} />
               <div className="grove">
                 {ranking.rows.map((row) => (
                   <div key={`tree-${row.position}-${row.name}`} className={row.isMe ? "is-me" : ""}>
@@ -202,9 +203,10 @@ export function ClassroomsView() {
               <div className="podium">
                 {podium.map((row, index) => (
                   <div key={`${row.position}-${row.name}`} className={`podium-step step-${index + 1}${row.isMe ? " is-me" : ""}`}>
-                    <span className="medal" aria-hidden="true">{MEDALS[index]}</span>
+                    <span className="rank-avatar" aria-hidden="true">{initials(row.name)}</span>
+                    <span className="medal">{MEDALS[index]}</span>
                     <strong>{row.name}</strong>
-                    <small>{row.points} pts</small>
+                    <small>{row.points} pts · {row.scans} escaneos</small>
                   </div>
                 ))}
               </div>
@@ -229,10 +231,58 @@ export function ClassroomsView() {
                 </table>
               </div>
               <button className="text-btn leave-btn" onClick={() => void leave(ranking.classroom)}>Salir de este salón</button>
+              <p className="rank-hint">El ranking suma puntos por cada residuo bien clasificado. El reto semanal se reinicia cada lunes.</p>
             </>
           )}
         </section>
       </section>
     </div>
+  );
+}
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((part) => part[0]?.toUpperCase() ?? "").join("") || "?";
+}
+
+function RaceBoard({ rows }: { rows: RankingRow[] }) {
+  const me = rows.find((row) => row.isMe);
+  const leader = rows[0];
+  const weekMax = Math.max(1, ...rows.map((row) => row.weekPoints), 40);
+  const behind = me && leader && me.position > 1 ? leader.points - me.points : 0;
+
+  return (
+    <section className="race-board">
+      <div className="race-banner">
+        <div>
+          <p className="race-kicker">Reto de la semana</p>
+          <h3>Carrera de reciclaje</h3>
+          <p>
+            {me
+              ? me.position === 1
+                ? `Vas primero con ${me.weekPoints} pts esta semana. Mantén el ritmo.`
+                : `Eres #${me.position}. Te faltan ${behind} pts para alcanzar a ${leader?.name ?? "el líder"}.`
+              : "Escanea y suma puntos para tu salón."}
+          </p>
+        </div>
+        <div className="race-stat">
+          <strong>{me?.weekPoints ?? 0}</strong>
+          <span>tus pts esta semana</span>
+        </div>
+      </div>
+      <ol className="race-list">
+        {rows.map((row) => (
+          <li key={`race-${row.position}-${row.name}`} className={row.isMe ? "is-me" : ""}>
+            <span className="race-pos">{row.position}</span>
+            <span className="rank-avatar sm">{initials(row.name)}</span>
+            <div className="race-meta">
+              <strong>{row.name}{row.isMe ? " · tú" : ""}</strong>
+              <i style={{ width: `${Math.max(8, (row.weekPoints / weekMax) * 100)}%` }} />
+            </div>
+            <em>+{row.weekPoints}</em>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }

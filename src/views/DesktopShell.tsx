@@ -15,6 +15,7 @@ const LINKS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
   { to: "/panel/estadisticas", label: "Estadísticas", icon: "chart" },
   { to: "/panel/guia", label: "Guía de materiales", icon: "book" },
   { to: "/panel/puntos", label: "Puntos de reciclaje", icon: "map" },
+  { to: "/panel/laboratorio", label: "Laboratorio", icon: "spark" },
   { to: "/panel/salones", label: "Salones y ranking", icon: "users" },
   { to: "/panel/modelo", label: "Modelo", icon: "cpu" },
   { to: "/panel/configuracion", label: "Configuración", icon: "settings" },

@@ -25,11 +25,15 @@ type Status = "locating" | "loading" | "ready" | "error";
 export function PointsView() {
   const [params] = useSearchParams();
   const initial = POINT_KINDS.find((kind) => kind === params.get("tipo")) ?? "Todos";
+  const startOnCampus = params.get("campus") === "ucc";
   const mapNode = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
   const markers = useRef(new Map<string, L.CircleMarker>());
-  const [origin, setOrigin] = useState<{ lat: number; lon: number; label: string }>(PASTO);
+  const [origin, setOrigin] = useState<{ lat: number; lon: number; label: string }>(
+    startOnCampus ? PASTO_BARRIOS.find((place) => place.label === "UCC Torobajo") ?? PASTO : PASTO,
+  );
+  const [campusOnly, setCampusOnly] = useState(startOnCampus);
   const [points, setPoints] = useState<RecyclingPoint[]>([]);
   const [filter, setFilter] = useState<PointKind | "Todos">(initial);
   const [status, setStatus] = useState<Status>("locating");
@@ -93,10 +97,13 @@ export function PointsView() {
     };
   }, [origin]);
 
-  const visible = useMemo(
-    () => (filter === "Todos" ? points : points.filter((point) => point.kinds.includes(filter) || (filter === "Electrónicos" && point.kinds.includes("Pilas")))),
-    [points, filter],
-  );
+  const visible = useMemo(() => {
+    const byKind =
+      filter === "Todos"
+        ? points
+        : points.filter((point) => point.kinds.includes(filter) || (filter === "Electrónicos" && point.kinds.includes("Pilas")));
+    return campusOnly ? byKind.filter((point) => point.campus === "ucc") : byKind;
+  }, [points, filter, campusOnly]);
 
   useEffect(() => {
     const instance = map.current;
@@ -113,7 +120,7 @@ export function PointsView() {
         radius: point.isCentre ? 9 : 7,
         color: "#053222",
         weight: 2,
-        fillColor: point.isCentre ? "#ffd166" : "#1de28d",
+        fillColor: point.campus === "ucc" ? "#7ee0ff" : point.isCentre ? "#ffd166" : "#1de28d",
         fillOpacity: 0.95,
       })
         .bindPopup(popupHtml(point, origin))
@@ -155,7 +162,7 @@ export function PointsView() {
     <div className="points-page">
       <header className="page-hero">
         <h1>Puntos de <em>reciclaje en Pasto</em></h1>
-        <p>Dónde llevar lo que EcoScan te dice que separes: plástico, papel, vidrio, pilas y RAEE, cerca de ti.</p>
+        <p>Campus UCC (Torobajo, Pandiaco y consultorio jurídico) y puntos de toda Pasto: EMAS, Unicentro, plazas.</p>
       </header>
       <form className="points-search glass-card" onSubmit={(event) => void search(event)}>
         <Icon name="pin" size={18} />
@@ -171,6 +178,9 @@ export function PointsView() {
         ))}
         <button type="button" className={origin.label === "Tu ubicación" ? "is-on" : ""} onClick={() => locateMe(setOrigin)}>
           Mi ubicación
+        </button>
+        <button type="button" className={campusOnly ? "is-on" : ""} onClick={() => setCampusOnly((value) => !value)}>
+          Solo campus UCC
         </button>
       </div>
       <div className="kind-chips" role="group" aria-label="Filtrar por tipo">
@@ -202,6 +212,7 @@ export function PointsView() {
                     {` · ${formatWalk(point)} · ${formatDrive(point)}`}
                     {point.address ? ` · ${point.address}` : ""}
                   </small>
+                  {point.campus === "ucc" ? <span className="point-kinds">Campus UCC</span> : null}
                   {point.kinds.length ? <span className="point-kinds">{point.kinds.join(" · ")}</span> : <span className="point-kinds dim">Aprovechables</span>}
                 </button>
                 <a href={directionsUrl(point, origin)} target="_blank" rel="noreferrer" className="point-go">Cómo llegar</a>
@@ -234,5 +245,6 @@ function locateMe(setOrigin: (place: { lat: number; lon: number; label: string }
 function popupHtml(point: RecyclingPoint, origin: { lat: number; lon: number; label: string }): string {
   const safe = (value: string) => value.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char] ?? char);
   const kinds = point.kinds.length ? point.kinds.join(" · ") : "Aprovechables";
-  return `<strong>${safe(point.name)}</strong><br/><span>${safe(kinds)}</span><br/><small>${safe(formatWalk(point))} · ${safe(formatDrive(point))}</small>${point.address ? `<br/><small>${safe(point.address)}</small>` : ""}<br/><a href="${directionsUrl(point, origin)}" target="_blank" rel="noreferrer">Cómo llegar</a>`;
+  const campus = point.campus === "ucc" ? "<br/><em>Campus UCC Pasto</em>" : "";
+  return `<strong>${safe(point.name)}</strong>${campus}<br/><span>${safe(kinds)}</span><br/><small>${safe(formatWalk(point))} · ${safe(formatDrive(point))}</small>${point.address ? `<br/><small>${safe(point.address)}</small>` : ""}<br/><a href="${directionsUrl(point, origin)}" target="_blank" rel="noreferrer">Cómo llegar</a>`;
 }

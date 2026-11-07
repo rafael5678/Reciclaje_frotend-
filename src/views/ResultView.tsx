@@ -1,6 +1,6 @@
 /** Last scan result and recycling steps. */
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { kindForMaterial } from "../services/pointsService";
+import { dropAdvice, formatWalk } from "../services/pointsService";
 import { Icon, stepIcon } from "../components/Icons";
 import { WasteArt } from "../components/WasteArt";
 import type { ObjectGuide, Scan } from "../models/types";
@@ -15,6 +15,7 @@ export function ResultView() {
   const guide = readGuide();
   const scanPath = wide ? "/panel/escanear" : "/app/escaner";
   const donePath = wide ? "/panel" : "/app/impacto";
+  const advice = scan ? dropAdvice(scan.materialCode, scan.container) : null;
 
   if (!scan) {
     return (
@@ -43,7 +44,7 @@ export function ResultView() {
         <WasteArt code={scan.materialCode} />
       </article>
       <section className="where-card">
-        <p>¿Dónde va?</p>
+        <p>¿Dónde lo tiro?</p>
         <div>
           <span className={`bin-mark tone-${scan.tone}`}><Icon name="bin" size={18} /></span>
           <div>
@@ -51,6 +52,25 @@ export function ResultView() {
             <span>{guide?.destination || scan.containerDetail}</span>
           </div>
         </div>
+        {advice ? (
+          <div className="drop-split">
+            <article>
+              <p>En la Cooperativa</p>
+              <strong>{advice.campusTitle}</strong>
+              <span>{advice.campusBody}</span>
+              {advice.campusPoint ? <small>{advice.campusPoint.name}</small> : null}
+            </article>
+            <article>
+              <p>En Pasto</p>
+              <strong>{advice.cityPoint ? advice.cityPoint.name : "Punto de la ciudad"}</strong>
+              <span>
+                {advice.cityPoint
+                  ? `${formatWalk(advice.cityPoint)} desde Torobajo · ${advice.kind}`
+                  : "Abre el mapa para EMAS, Unicentro y plazas."}
+              </span>
+            </article>
+          </div>
+        ) : null}
       </section>
       {guide?.meaning ? <p className="warning">{guide.meaning}</p> : null}
       <section className="steps-card">
@@ -64,9 +84,19 @@ export function ResultView() {
         ))}
       </section>
       {guide?.tip ? <p className="warning">{guide.tip}</p> : scan.warning ? <p className="warning">{scan.warning}</p> : null}
-      <Link className="ghost-btn points-link" to={`/panel/puntos?tipo=${encodeURIComponent(kindForMaterial(scan.materialCode))}`}>
+      {scan.materialCode === "PET" || scan.materialCode === "HDPE" ? (
+        <Link className="ghost-btn points-link" to="/panel/laboratorio">
+          <Icon name="spark" size={16} />
+          Separar tapa, etiqueta y cuerpo
+        </Link>
+      ) : null}
+      <Link className="ghost-btn points-link" to="/panel/laboratorio">
+        <Icon name="spark" size={16} />
+        Laboratorio: ruta Pasto y replay IA
+      </Link>
+      <Link className="ghost-btn points-link" to={advice?.mapHref ?? "/panel/puntos?campus=ucc"}>
         <Icon name="map" size={16} />
-        ¿Dónde lo llevo? Ver puntos cercanos
+        Ver mapa: campus UCC y Pasto
       </Link>
       <button className="cta" onClick={() => navigate(donePath)}>Aceptar</button>
       <button className="text-btn" onClick={() => navigate(scanPath)}>Escanear otro</button>

@@ -19,6 +19,7 @@ export function ScansView() {
   const [scans, setScans] = useState<Scan[]>([]);
   const [filter, setFilter] = useState("Todos");
   const [error, setError] = useState("");
+  const [preview, setPreview] = useState<{ src: string; name: string } | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -109,6 +110,7 @@ export function ScansView() {
           <table>
             <thead>
               <tr>
+                <th className="photo-col">Foto</th>
                 <th>Objeto</th>
                 <th>Material</th>
                 <th>Contenedor</th>
@@ -120,9 +122,11 @@ export function ScansView() {
             <tbody>
               {visible.map((scan) => (
                 <tr key={scan.id}>
+                  <td className="photo-col">
+                    <ScanPhoto scan={scan} compact onOpen={(src) => setPreview({ src, name: scan.objectName })} />
+                  </td>
                   <td>
                     <span className="object-cell">
-                      <ScanPhoto scan={scan} compact />
                       <span>
                         <span className="code-badge" style={{ color: scan.accent, background: `${scan.accent}22` }}>{scan.materialCode}</span>
                         {scan.objectName}
@@ -141,6 +145,14 @@ export function ScansView() {
           {visible.length === 0 ? <p className="empty">No hay escaneos en este filtro.</p> : null}
         </div>
       </section>
+      {preview ? (
+        <button type="button" className="photo-lightbox" onClick={() => setPreview(null)} aria-label="Cerrar foto">
+          <div>
+            <img src={preview.src} alt={preview.name} />
+            <p>{preview.name}</p>
+          </div>
+        </button>
+      ) : null}
     </div>
   );
 }

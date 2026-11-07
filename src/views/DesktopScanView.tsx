@@ -13,7 +13,7 @@ export function DesktopScanView() {
       </header>
       <section className="hero-trio is-compact">
         <div className="tile-stack">
-          <Step title="1 · Toma o sube la foto" text="Buena luz y fondo limpio." />
+          <Step title="1 · Sube la foto" text="Buena luz y fondo limpio." />
           <Step title="2 · La IA lo analiza" text="Detecta el tipo de material." />
         </div>
         <div className="bag-stage">
