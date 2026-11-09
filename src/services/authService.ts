@@ -3,16 +3,32 @@ import type { Session, User } from "../models/types";
 import { authRepository } from "../repositories/authRepository";
 import { ApiError } from "../repositories/http";
 import { sessionRepository } from "../repositories/sessionRepository";
+import { credentials } from "./credentials";
 
 export type AuthResult = { session: Session; moved: number };
 
 class AuthService {
   async login(email: string, password: string): Promise<AuthResult> {
-    return this.keep(await authRepository.login(email, password, this.guestToken()));
+    const cleanEmail = credentials.sanitizeEmail(email);
+    const cleanPassword = credentials.sanitizePassword(password);
+    const emailError = credentials.emailError(cleanEmail);
+    const passwordError = credentials.passwordError(cleanPassword);
+    if (emailError) throw new Error(emailError);
+    if (passwordError) throw new Error(passwordError);
+    return this.keep(await authRepository.login(cleanEmail, cleanPassword, this.guestToken()));
   }
 
   async register(name: string, email: string, password: string): Promise<AuthResult> {
-    return this.keep(await authRepository.register(name, email, password, this.guestToken()));
+    const cleanName = credentials.finishName(name);
+    const cleanEmail = credentials.sanitizeEmail(email);
+    const cleanPassword = credentials.sanitizePassword(password);
+    const nameError = credentials.nameError(cleanName);
+    const emailError = credentials.emailError(cleanEmail);
+    const passwordError = credentials.passwordError(cleanPassword);
+    if (nameError) throw new Error(nameError);
+    if (emailError) throw new Error(emailError);
+    if (passwordError) throw new Error(passwordError);
+    return this.keep(await authRepository.register(cleanName, cleanEmail, cleanPassword, this.guestToken()));
   }
 
   async guest(): Promise<AuthResult> {

@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Icon, type IconName } from "../components/Icons";
 import { Brand } from "../components/Logo";
 import { Planet } from "../components/Planet";
+import { credentials } from "../services/credentials";
 import { authService, type AuthResult } from "../services/authService";
 import { prefersReducedMotion } from "../services/motion";
 import { useSession } from "../context/SessionProvider";
@@ -101,11 +102,29 @@ export function LoginView() {
         <form onSubmit={submit} className="form auth-form" key={mode}>
           {mode === "register" ? (
             <Field icon="user" label="Nombre">
-              <input value={name} onChange={(event) => setName(event.target.value)} required minLength={2} autoComplete="off" placeholder=" " />
+              <input
+                value={name}
+                onChange={(event) => setName(credentials.sanitizeName(event.target.value))}
+                required
+                minLength={2}
+                maxLength={80}
+                autoComplete="off"
+                placeholder=" "
+              />
             </Field>
           ) : null}
           <Field icon="mail" label="Correo">
-            <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required autoComplete={mode === "login" ? "username" : "off"} placeholder=" " />
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(credentials.sanitizeEmail(event.target.value))}
+              onKeyDown={(event) => {
+                if (event.key === " ") event.preventDefault();
+              }}
+              required
+              autoComplete={mode === "login" ? "username" : "off"}
+              placeholder=" "
+            />
           </Field>
           <Field
             icon="lock"
@@ -119,9 +138,13 @@ export function LoginView() {
             <input
               type={showPassword ? "text" : "password"}
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) => setPassword(credentials.sanitizePassword(event.target.value))}
+              onKeyDown={(event) => {
+                if (event.key === " ") event.preventDefault();
+              }}
               required
               minLength={6}
+              maxLength={80}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
               placeholder=" "
             />
