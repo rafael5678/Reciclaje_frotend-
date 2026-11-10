@@ -156,6 +156,8 @@ const CODE_TO_ID: Record<string, string> = {
 };
 
 class LabCatalog {
+  readonly mistakeCost = MISTAKE_COST;
+
   bins(): LabBin[] {
     return BINS;
   }

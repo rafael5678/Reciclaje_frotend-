@@ -2,7 +2,7 @@
 import type { LabThrowResult } from "../models/lab";
 import { labRepository } from "../repositories/labRepository";
 import { sessionRepository } from "../repositories/sessionRepository";
-import { labCatalog, MISTAKE_COST } from "./labCatalog";
+import { labCatalog } from "./labCatalog";
 
 class LocalLedger {
   total(userKey: string): number {
@@ -39,7 +39,7 @@ class LabService {
     if (!piece || !bin) return null;
     const expected = labCatalog.bin(piece.binId);
     const correct = piece.binId === binId;
-    const delta = correct ? 0 : -MISTAKE_COST;
+    const delta = correct ? 0 : -labCatalog.mistakeCost;
     const userKey = sessionRepository.token() || "guest";
     const labPenalty = persist ? this.ledger.add(userKey, delta) : this.ledger.total(userKey) + delta;
     return {
