@@ -4,7 +4,8 @@ import type { BBox, Score, VisionHit } from "../models/types";
 import { boxJump, clamp, mixBox } from "./bbox";
 import { detectMiraFromCanvas } from "./miraService";
 import { classifyTrashnet, type TrashClass, type TrashGuess } from "./trashnetService";
-import { detectFrame, rememberVision, type Frame } from "./visionService";
+import { rememberVision, type Frame } from "./visionService";
+import { visionWorker } from "./visionWorker";
 
 const SHAPE_ONLY = new Set(["Lápiz", "Lapicero", "Celular", "Control remoto", "Botella plástica PET", "Billete", "Papel higiénico"]);
 
@@ -26,7 +27,7 @@ export class ScanBrain {
 
   async analyze(frame: Frame, canvas: HTMLCanvasElement, miraReady: boolean): Promise<VisionHit | null> {
     const started = performance.now();
-    const cheap = detectFrame(frame);
+    const cheap = await visionWorker.detect(frame);
     if (cheap && SHAPE_ONLY.has(cheap.objectName)) return this.keep(cheap, performance.now() - started);
     if (cheap?.objectName === "Hoja de papel" && cheap.bbox.w < 0.82 && cheap.bbox.h < 0.82) {
       return this.keep(cheap, performance.now() - started);
@@ -55,7 +56,7 @@ export class ScanBrain {
     this.miraAge = 99;
     this.misses = 0;
     const started = performance.now();
-    const cheap = detectFrame(frame);
+    const cheap = await visionWorker.detect(frame);
     if (cheap && (SHAPE_ONLY.has(cheap.objectName) || cheap.material.code === "ORG")) {
       return this.stamp(cheap, performance.now() - started);
     }

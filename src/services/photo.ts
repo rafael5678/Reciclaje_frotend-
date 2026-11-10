@@ -1,8 +1,11 @@
 /** Compact JPEG so Render is not overloaded when saving a scan. */
+import { visionWorker } from "./visionWorker";
 
 class PhotoCompressor {
   async compact(file: File, maxSide = 1280, quality = 0.82): Promise<File> {
     if (!file.type.startsWith("image/") && !file.type.startsWith("application/octet-stream")) return file;
+    const fromWorker = await visionWorker.compact(file, maxSide, quality);
+    if (fromWorker) return fromWorker;
     try {
       const bitmap = await createImageBitmap(file);
       const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
