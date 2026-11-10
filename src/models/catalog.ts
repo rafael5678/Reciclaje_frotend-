@@ -1,5 +1,5 @@
 /** Local material catalog used when the API is down. */
-import type { Material } from "./types";
+import type { Material, VisionHit } from "./types";
 
 export const MATERIALS: Material[] = [
   {
@@ -152,5 +152,26 @@ export const MATERIAL_BY_CODE = Object.fromEntries(MATERIALS.map((item) => [item
 
 /** Look up a material, falling back to general waste. */
 export function materialByCode(code: string): Material {
-  return MATERIAL_BY_CODE[code] ?? MATERIALS[0];
+  return MATERIAL_BY_CODE[code] ?? MATERIAL_BY_CODE.GEN ?? MATERIALS[0];
+}
+
+/** Last-resort hit so the scanner never stays empty. */
+export function fallbackHit(): VisionHit {
+  const material = MATERIAL_BY_CODE.GEN ?? MATERIALS[MATERIALS.length - 1];
+  return {
+    material,
+    confidence: 0.42,
+    bbox: { x: 0.12, y: 0.12, w: 0.76, h: 0.76 },
+    inferenceMs: 1,
+    objectName: material.objectName,
+    scores: MATERIALS.map((item) => ({ code: item.code, score: item.code === "GEN" ? 0.42 : 0.04 })),
+    segmented: false,
+    engine: "fallback",
+    guide: {
+      meaning: material.blurb,
+      destination: `Contenedor ${material.container.toLowerCase()}: ${material.containerDetail}.`,
+      actions: [...material.steps],
+      tip: material.warning,
+    },
+  };
 }

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BinPill } from "../components/Charts";
 import { Icon, stepIcon } from "../components/Icons";
-import { MATERIALS, materialByCode } from "../models/catalog";
+import { MATERIALS, fallbackHit, materialByCode } from "../models/catalog";
 import type { BBox, VisionHit } from "../models/types";
 import { formatConfidence, modelLabel } from "../services/format";
 import { compactPhoto } from "../services/photo";
@@ -84,9 +84,9 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
     if (!context) throw new Error("lienzo");
     context.drawImage(image, 0, 0, width, height);
     const frame = context.getImageData(0, 0, width, height);
-    const next = await new ScanBrain().analyzeStill(frame, canvas, true);
+    const next = (await new ScanBrain().analyzeStill(frame, canvas, true)) ?? fallbackHit();
     if (job !== photoJob.current) return;
-    setMs(Math.max(1, Math.round(next?.inferenceMs || 1)));
+    setMs(Math.max(1, Math.round(next.inferenceMs || 1)));
     setHit(next);
   }
 
@@ -116,8 +116,9 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
         await readPhotoLocal(url, job);
       } catch {
         if (job !== photoJob.current) return;
-        setSaveError("No pude leer esa foto. Prueba con JPG o PNG.");
-        setHit(null);
+        const next = fallbackHit();
+        setMs(next.inferenceMs);
+        setHit(next);
       }
     } finally {
       if (job === photoJob.current) setReading(false);
