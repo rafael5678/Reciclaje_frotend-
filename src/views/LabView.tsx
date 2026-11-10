@@ -30,8 +30,12 @@ export function LabView() {
   const binsRef = useRef<HTMLDivElement>(null);
   const heldRef = useRef<string | null>(null);
   const peelRef = useRef<{ id: string | null; x: number }>({ id: null, x: 0 });
+  const sortedRef = useRef(sorted);
+  const impactRef = useRef(impact);
   heldRef.current = held;
   peelRef.current = { id: peelId, x: peelX };
+  sortedRef.current = sorted;
+  impactRef.current = impact;
 
   const queue = useMemo(() => labCatalog.practiceQueue(scans), [scans]);
   const specimen = queue.find((item) => item.id === specimenId) ?? queue[0];
@@ -47,12 +51,12 @@ export function LabView() {
         if (alive) setScans(rows);
       })
       .catch(() => {
-        if (alive) setScans(impact?.recent ?? []);
+        if (alive) setScans(impactRef.current?.recent ?? []);
       });
     return () => {
       alive = false;
     };
-  }, [revision, impact]);
+  }, [revision]);
 
   useEffect(() => {
     if (impact) setPoints(impact.points);
@@ -116,13 +120,28 @@ export function LabView() {
 
   async function toss(pieceId: string, binId: string) {
     const piece = labCatalog.piece(pieceId);
-    if (!piece || sorted.has(markKey(pieceId)) || isLocked(piece) || !isPrepared(piece)) return;
-    const result = await labService.throw(pieceId, binId, impact?.points ?? points);
+    const key = markKey(pieceId);
+    if (!piece || sortedRef.current.has(key) || isLocked(piece) || !isPrepared(piece)) return;
+    const instant = labService.preview(pieceId, binId, impactRef.current?.points ?? points);
+    if (instant) {
+      setFeedback(instant);
+      setPoints(instant.points);
+      if (instant.correct) {
+        const next = new Set(sortedRef.current).add(key);
+        sortedRef.current = next;
+        setSorted(next);
+      }
+    }
+    const result = await labService.throw(pieceId, binId, impactRef.current?.points ?? points);
     setFeedback(result);
     setPoints(result.points);
-    if (result.correct) {
-      setSorted((current) => new Set(current).add(markKey(pieceId)));
-    }
+    setSorted((current) => {
+      const next = new Set(current);
+      if (result.correct) next.add(key);
+      else next.delete(key);
+      sortedRef.current = next;
+      return next;
+    });
     bump();
   }
 

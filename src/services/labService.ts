@@ -25,7 +25,15 @@ class LocalLedger {
 class LabService {
   private ledger = new LocalLedger();
 
+  preview(pieceId: string, binId: string, scanPoints: number): LabThrowResult | null {
+    return this.grade(pieceId, binId, scanPoints, false);
+  }
+
   gradeLocal(pieceId: string, binId: string, scanPoints: number): LabThrowResult | null {
+    return this.grade(pieceId, binId, scanPoints, true);
+  }
+
+  private grade(pieceId: string, binId: string, scanPoints: number, persist: boolean): LabThrowResult | null {
     const piece = labCatalog.piece(pieceId);
     const bin = labCatalog.bin(binId);
     if (!piece || !bin) return null;
@@ -33,7 +41,7 @@ class LabService {
     const correct = piece.binId === binId;
     const delta = correct ? 0 : -MISTAKE_COST;
     const userKey = sessionRepository.token() || "guest";
-    const labPenalty = this.ledger.add(userKey, delta);
+    const labPenalty = persist ? this.ledger.add(userKey, delta) : this.ledger.total(userKey) + delta;
     return {
       correct,
       delta,
