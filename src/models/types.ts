@@ -83,6 +83,8 @@ export type ServerHealth = {
   state: "checking" | "online" | "offline";
   database: boolean;
   gemini: boolean;
+  anthropic: boolean;
+  anthropicModel: string | null;
   models: { name: string; available: boolean; retryAt: number | null }[];
   perMinute: number;
   usedLastMinute: number;

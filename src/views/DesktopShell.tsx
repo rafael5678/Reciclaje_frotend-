@@ -99,11 +99,13 @@ function ServerCard() {
     <div className={health.database ? "side-card status-card" : "side-card status-card is-off"}>
       <strong><i />{health.database ? "Servidor conectado" : "Base de datos caída"}</strong>
       <p>
-        {!health.gemini
+        {!health.gemini && !health.anthropic
           ? "Gemini no está configurado. Se usan los modelos locales."
           : ready
             ? `IA: ${modelLabel(ready.name)} · ${health.usedLastMinute}/${health.perMinute} por minuto`
-            : "Gemini agotado por ahora. Se usan MIRA y TrashNet."}
+            : health.anthropic
+              ? "Gemini agotado. Respaldo: Claude Haiku 5.5."
+              : "Gemini agotado por ahora. Se usan MIRA y TrashNet."}
       </p>
     </div>
   );

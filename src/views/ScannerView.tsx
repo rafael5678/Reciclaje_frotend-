@@ -197,6 +197,8 @@ export function ScannerView({ variant = "phone" }: { variant?: "phone" | "desk" 
           <span className="badge">
             {hit?.engine === "gemini"
               ? modelLabel(hit.model ?? "gemini")
+              : hit?.engine === "anthropic"
+                ? modelLabel(hit.model ?? "claude-haiku-5-5")
               : hit?.engine === "forma"
                 ? "Forma del objeto"
                 : miraReady && trashReady

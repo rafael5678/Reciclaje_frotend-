@@ -62,8 +62,9 @@ export function signedPercent(value: number): string {
   return `${value}%`;
 }
 
-/** Human label for a Gemini model id. */
+/** Human label for a Gemini or Claude model id. */
 export function modelLabel(name: string): string {
+  if (name.startsWith("claude-haiku")) return "Haiku 5.5";
   return name
     .split("-")
     .filter((part) => part !== "preview")

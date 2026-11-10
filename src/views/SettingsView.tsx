@@ -21,7 +21,11 @@ export function SettingsView() {
   const navigate = useNavigate();
   const guest = Boolean(session?.user.guest);
   const name = session?.user.name ?? "";
-  const engines = health.models.map((model) => modelLabel(model.name)).join(" y ");
+  const cloud = [
+    ...health.models.map((model) => modelLabel(model.name)),
+    health.anthropic ? modelLabel(health.anthropicModel || "claude-haiku-5-5") : "",
+  ].filter(Boolean);
+  const engines = cloud.join(", ");
   const [storage, setStorage] = useState<PasswordStorage | null>(null);
 
   useEffect(() => {
@@ -46,7 +50,7 @@ export function SettingsView() {
         </div>
       </section>
       <section className="panel-card settings-list">
-        <div><strong>Motor</strong><span>{engines ? `${engines}, con MIRA y TrashNet de respaldo` : "MIRA y TrashNet"}</span></div>
+        <div><strong>Motor</strong><span>{engines ? `${engines}, luego MIRA y TrashNet` : "MIRA y TrashNet"}</span></div>
         <div><strong>Base de datos</strong><span>{health.state !== "online" ? "Sin conexión" : health.database ? "Conectada" : "No disponible"}</span></div>
         <div><strong>Privacidad</strong><span>La foto se usa para clasificar. El historial queda en tu cuenta.</span></div>
         <div>
