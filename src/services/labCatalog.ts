@@ -2,7 +2,7 @@
 import type { LabBin, LabPiece, LabSpecimen } from "../models/lab";
 import type { Scan } from "../models/types";
 
-export const MISTAKE_COST = 5;
+const MISTAKE_COST = 5;
 
 const BINS: LabBin[] = [
   { id: "yellow", title: "Amarillo", detail: "Plásticos y envases", tone: "yellow" },
